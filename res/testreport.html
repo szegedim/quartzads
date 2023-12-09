@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Licensed under Creative Commons CC0.-->
+  <!--     To the extent possible under law, the author(s) have dedicated all copyright and related and-->
+  <!-- neighboring rights to this software to the public domain worldwide.-->
+  <!--     This software is distributed without any warranty.-->
+  <!--     You should have received a copy of the CC0 Public Domain Dedication along with this software.-->
+  <!--     If not, see <https://creativecommons.org/publicdomain/zero/1.0/legalcode>.-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show My Card℠</title>
+  <style>
+    .showmycard-description {
+      text-align: center;
+    }
+    .showmycard-container {
+      font-family: system-ui;
+      color: darkslategray;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .showmycard {
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      display: inline-block;
+      border: 4px solid darkorchid;
+      margin: 20px;
+    }
+    .showmycard::after {
+      font-family: system-ui;
+      font-size: small;
+      content: 'demo.showmycard.com℠';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard::before {
+      font-family: system-ui;
+      font-size: small;
+      content: '🍁 Sponsored by';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    body {
+      font-family: system-ui;
+      color: lightgray;
+      margin: 0;
+      padding: 20px;
+      background: darkorchid;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="text"],
+    input[type="file"] {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background: darkred;
+    }
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="showmycard-description">
+    <h1>Card report</h1>
+    <p>This advertisement was created with the image below.</p>
+  </div>
+  <div class="showmycard-container">
+    <div class="showmycard" aria-label="Description of the image">
+      <img id='imagePreview' src="f7e77596ddf4b12e38e469421d78f3cc.png" alt="Descriptive text" style="width: 3in;height: auto;" onclick="window.open('https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a','_self')">
+    </div>
+  </div>
+  <div class="showmycard-description">
+    <p>Your card is located at this site.</p>
+    <!-- Location goes here -->
+    <p>Your card points to this url.</p>
+  </div>
+  <div class="showmycard-container">
+    <p>https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a</p>
+  </div>
+  <div class="showmycard-container">
+    <div class="showmycard1" aria-label="Description of the image">
+      <h2>Card Traffic - last 24 hours</h2>
+      <h3>🍁 <span style="color: blue">Impressions</span>     🎯 <span style="color: green">Clicks</span></h3>
+      <svg width="5in" height="4in">
+        <style>
+          .grid {
+            stroke: black;
+            stroke-width: 0.2;
+          }
+          .axis {
+            stroke: black;
+            stroke-width: 2;
+          }
+        </style>
+        <g transform="scale(4.5,3.5)">
+
+          <line class="grid" x1="0" x2="100" y1="0" y2="0"></line>
+          <line class="grid" x1="0" x2="100" y1="10" y2="10"></line>
+          <line class="grid" x1="0" x2="100" y1="20" y2="20"></line>
+          <line class="grid" x1="0" x2="100" y1="30" y2="30"></line>
+          <line class="grid" x1="0" x2="100" y1="40" y2="40"></line>
+          <line class="grid" x1="0" x2="100" y1="50" y2="50"></line>
+          <line class="grid" x1="0" x2="100" y1="60" y2="60"></line>
+          <line class="grid" x1="0" x2="100" y1="70" y2="70"></line>
+          <line class="grid" x1="0" x2="100" y1="80" y2="80"></line>
+          <line class="grid" x1="0" x2="100" y1="90" y2="90"></line>
+
+          <line class="grid" y1="0" y2="100" x1="00" x2="00"></line>
+          <line class="grid" y1="0" y2="100" x1="10" x2="10"></line>
+          <line class="grid" y1="0" y2="100" x1="20" x2="20"></line>
+          <line class="grid" y1="0" y2="100" x1="30" x2="30"></line>
+          <line class="grid" y1="0" y2="100" x1="40" x2="40"></line>
+          <line class="grid" y1="0" y2="100" x1="50" x2="50"></line>
+          <line class="grid" y1="0" y2="100" x1="60" x2="60"></line>
+          <line class="grid" y1="0" y2="100" x1="70" x2="70"></line>
+          <line class="grid" y1="0" y2="100" x1="80" x2="80"></line>
+          <line class="grid" y1="0" y2="100" x1="90" x2="90"></line>
+          <line class="grid" y1="0" y2="100" x1="99" x2="99"></line>
+
+          <line class="axis" x1="0" x2="0" y1="0" y2="100"></line>
+          <line class="axis" x1="0" x2="100" y1="99" y2="99"></line>
+
+          <style>
+            .impression {
+              font-family: system-ui;
+              font-size: x-small;
+              fill: darkblue;
+            }
+            .click {
+              font-family: system-ui;
+              font-size: x-small;
+              fill: darkgreen;
+            }
+          </style>
+          <!-- Data begins here -->
+          <g transform="">
+          <rect class="impression" x="20" y="60" width="10" height="35" rx="2.5"></rect>
+            <rect class="click" x="60" y="50" width="10" height="45" rx="2.5"></rect>
+          <text class="impression" x="20" y="55">30</text>
+          <text class="click" x="60" y="45">40</text>
+          </g>
+          <!-- Data ends here -->
+        </g>
+      </svg>
+    </div>
+  </div>
+</body>

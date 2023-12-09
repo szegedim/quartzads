@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Licensed under Creative Commons CC0.-->
+  <!--     To the extent possible under law, the author(s) have dedicated all copyright and related and-->
+  <!-- neighboring rights to this software to the public domain worldwide.-->
+  <!--     This software is distributed without any warranty.-->
+  <!--     You should have received a copy of the CC0 Public Domain Dedication along with this software.-->
+  <!--     If not, see <https://creativecommons.org/publicdomain/zero/1.0/legalcode>.-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show My Card℠</title>
+  <style>
+    .showmycard-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .showmycard {
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      display: inline-block;
+      border: 4px solid darkorchid;
+      margin: 20px;
+    }
+    .showmycard::after {
+      font-family: system-ui;
+      font-size: small;
+      content: 'demo.showmycard.com℠';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard::before {
+      font-family: system-ui;
+      font-size: small;
+      content: '🍁 Sponsored by';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    body {
+      font-family: system-ui;
+      margin: 0;
+      padding: 20px;
+      background: darkorchid;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="text"],
+    input[type="file"] {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background: darkred;
+    }
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Show My Card℠. Advertisement Technology.</h2>
+  <ul>This is a simple paid media demonstration.</ul>
+  <ul>The card as is displayed for 24 hours.</ul>
+  <ul>The selected slot with the context does not change.</ul>
+  <ul>You will get a link to monitor the results.</ul>
+  <ul>Ask for a refund, if not satisfied with the service.</ul>
+  <form id="upload-form">
+    <label for="message">Instructions</label>
+    <input type="text" id="message" name="message" placeholder="Englang instructions." value="Point the ad card to https://www.showmycard.com and inject ads.">
+    <label for="ad">Upload Ad Card Image.</label>
+    <label for="ad">Specification: square png file of 1k pixels displayed in 3 inches.</label>
+    <input type="file" id="ad" name="ad" accept="image/png">
+    <input type="submit" value="Pay on Stripe">
+  </form>
+</div>
+<div class="showmycard-container">
+  <div class="showmycard" aria-label="Description of the image">
+    <img id='imagePreview' src="/logo.png" alt="Descriptive text" style="width: 3in;height: auto;" >
+  </div>
+</div>
+
+<script>
+  let validMessage = document.getElementById('message').value
+  document.getElementById('message').addEventListener('keyup', function (evt) {
+    let newMessage = evt.target.value
+    if (!newMessage.startsWith('Point the ad card to ')) {
+      evt.target.value = validMessage
+      return;
+    }
+    if (!newMessage.endsWith(' and inject ads.')) {
+      evt.target.value = validMessage
+      return;
+    }
+    validMessage = newMessage
+  })
+  document.getElementById('ad').addEventListener('change', function (evt) {
+    let image = document.getElementById('imagePreview')
+    image.onload = function(imageEvent) {
+      let canvas = document.createElement('canvas');
+      let context = canvas.getContext('2d');
+
+      canvas.width = image.width;
+      canvas.height = image.height;
+      context.drawImage(image, 0, 0, image.width, image.height);
+    }
+
+    let fileInput = document.getElementById('ad');
+    let file = fileInput.files[0];
+    if (file) {
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function(event) {
+        image.src = event.target.result;
+      }
+    }
+  })
+
+  document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var fileInput = document.getElementById('ad');
+    var file = fileInput.files[0];
+
+    if (file) {
+      const formData = new FormData(this);
+
+      fetch(window.location, {
+        method: 'PUT',
+        body: formData
+      })
+      .then(data => {
+        console.log('https://buy.stripe.com/test_5kA4gMaZYaiY3JK8ww' + window.location.search.toString())
+        window.open('https://buy.stripe.com/test_5kA4gMaZYaiY3JK8ww' + window.location.search.toString(), '_self')
+        //window.open(window.location.toString().replace('/ad','/rp'),'_self')
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  });
+</script>
+</body>
+</html>

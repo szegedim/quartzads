@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Licensed under Creative Commons CC0.-->
+    <!--     To the extent possible under law, the author(s) have dedicated all copyright and related and-->
+    <!-- neighboring rights to this software to the public domain worldwide.-->
+    <!--     This software is distributed without any warranty.-->
+    <!--     You should have received a copy of the CC0 Public Domain Dedication along with this software.-->
+    <!--     If not, see <https://creativecommons.org/publicdomain/zero/1.0/legalcode>.-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show My Card℠</title>
+    <style>
+        body {
+            font-family: system-ui;
+            margin: 0;
+            padding: 20px;
+            background: darkorchid;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 40px auto;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input[type="text"],
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: darkorchid;
+            color: white;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: darkorchid;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background: darkred;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Show My Card℠.</h2>
+        <ul>This is a simple paid media demonstration.</ul>
+        <ul>Our goal is to demonstrate www.showmycard.com for funding.</ul>
+        <ul>It generates traffic and revenue for reusable content for AI labeled CC0.</ul>
+        <ul>Select the content to display with paid ads.</ul>
+        <ul>Make sure you have rights to reuse the base content.</ul>
+        <ul>Customers can pay for ads displayed with the content.</ul>
+        <ul>It collects ads related to the content called clustering.</ul>
+        <ul>You can pay for traffic from layer one media to boost revenue.</ul>
+        <form id="upload-form">
+            <label for="message">Instructions</label>
+            <input type="text" id="message" name="message" placeholder="Englang instructions." value="Add advertisement to https://magazine.foundersreview.us page that you have rights to.">
+            <input type="submit" value="Launch">
+        </form>
+    </div>
+
+    <script>
+        let validMessage = document.getElementById('message').value
+        document.getElementById('message').addEventListener('keyup', function (evt) {
+            let newMessage = evt.target.value
+            if (!newMessage.startsWith('Add advertisement to ')) {
+                evt.target.value = validMessage
+                return;
+            }
+            if (!newMessage.endsWith(' page that you have rights to.')) {
+                evt.target.value = validMessage
+                return;
+            }
+            validMessage = newMessage
+        })
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var message = document.getElementById('message').value;
+
+            console.log("Message: " + message);
+            const formData = new FormData(this);
+
+            fetch(window.location, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(data => {
+                console.log(data);
+                window.open('/', '_self')
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
