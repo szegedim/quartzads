@@ -13,12 +13,13 @@ import (
 //You should have received a copy of the CC0 Public Domain Dedication along with this software.
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
 
-// TODO Add actual redis stub
 // TODO Isolated security locking SGUIDs
 
 var lock sync.Mutex
 
 func singleton() {
+	// This is how to extend with Redis for scaling.
+	// I am not sure whether this is really needed.
 	//go func() {
 	//	url := os.Getenv("REDISURL")
 	//	if url != "" {
@@ -42,6 +43,9 @@ func Set(key string, value []byte) {
 	defer lock.Unlock()
 
 	redis[key] = value
+	go func() {
+		persistedSet(key, value)
+	}()
 }
 
 func Get(key string) (value []byte) {
@@ -51,13 +55,20 @@ func Get(key string) (value []byte) {
 
 	value, ok := redis[key]
 	if !ok {
-		value = make([]byte, 0)
+		value = persistedGet(key)
+		if value == nil {
+			value = make([]byte, 0)
+		}
 	}
 	return
 }
 
 func List() (keys string) {
-	singleton()
+	keys = persistedList()
+	if keys != "" {
+		return
+	}
+
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -67,4 +78,18 @@ func List() (keys string) {
 	}
 	keys = b.String()
 	return
+}
+
+func persistedGet(key string) (value []byte) {
+	singleton()
+	return nil
+}
+
+func persistedSet(key string, value []byte) {
+	singleton()
+}
+
+func persistedList() (keys string) {
+	singleton()
+	return ""
 }
