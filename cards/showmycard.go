@@ -161,7 +161,7 @@ func handleReport(writer http.ResponseWriter, request *http.Request) bool {
 				<text class="impression" x="20" y="%d">%d</text>
 				<text class="click" x="60" y="%d">%d</text>
 				`
-			s0 = strings.ReplaceAll(s0, s0[begin:end+len("<!-- Data ends here -->")], fmt.Sprintf(pattern, 85-impressionbar, impressionbar, 85-clickbar, clickbar, 92, impressions, 92, clicks))
+			s0 = strings.ReplaceAll(s0, s0[begin:end+len("<!-- Data ends here -->")], fmt.Sprintf(pattern, 85-impressionbar, impressionbar, 85-clickbar, clickbar, 96, impressions, 96, clicks))
 		}
 		s0 = strings.ReplaceAll(s0, "<!-- Location goes here -->", "<a href=\""+GetLocation(metadata.SGUID(apiKey))+"\">Paid media</a>")
 		buffered := bufio.NewWriter(writer)
@@ -193,7 +193,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	client := &http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		http.Error(res, err.Error(), http.StatusBadGateway)
+		//http.Error(res, err.Error(), http.StatusBadGateway)
 		return
 	}
 	defer response.Body.Close()
@@ -203,18 +203,20 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	}
 
 	res.WriteHeader(response.StatusCode)
+	res.Header().Set("Cache-Control", "no-store")
 
 	content, _ := io.ReadAll(response.Body)
 	contentWithCards := string(content)
 
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
-	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>🍁Block ads for your convenience. <a href=\"%s\">(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🍁(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
 	if placeholders == 0 {
-		contentWithCards = strings.ReplaceAll(contentWithCards, "<body>", "<body>"+metadata.Placeholder+adBlocker)
-		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", metadata.Placeholder+"</body>")
+		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
+		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
 		placeholders = 2
 	} else {
-		contentWithCards = strings.ReplaceAll(contentWithCards, "<body>", "<body>"+adBlocker)
+		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body>"+adBlocker+"<div")
+		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+"</body>")
 	}
 
 	for i := 0; i < placeholders; i++ {
@@ -238,6 +240,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	endScriptHeader := strings.Index(baseString, "<!-- Script ends here -->")
 	contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", baseString[beginScriptHeader:endScriptHeader+len("<!-- Script ends here -->")]+"</body>")
 
+	contentWithCards = strings.ReplaceAll(contentWithCards, metadata.ProxySite+req.URL.Path, req.URL.Path)
 	contentWithCards = strings.ReplaceAll(contentWithCards, "utm_content=sitename", "utm_content="+metadata.SiteName)
 
 	//if strings.HasPrefix(response.Header.Get("Content-Type"), "text/html") {

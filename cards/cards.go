@@ -81,7 +81,6 @@ func BookImpressionOrCLick(id metadata.SGUID, log string) {
 func GetStatistics(id metadata.SGUID) (clicks, impressions int) {
 	logId := string(id) + ".activity"
 	current := string(Get(logId))
-	fmt.Println(current)
 	clicks = strings.Count(current, "Element clicked")
 	impressions = strings.Count(current, "Element became visible")
 	return
