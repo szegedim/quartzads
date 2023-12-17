@@ -5,7 +5,6 @@ import (
 	"os"
 	"showmycard.com/metadata"
 	"strings"
-	"time"
 )
 
 //Licensed under Creative Commons CC0.
@@ -27,6 +26,10 @@ func NewCard(path string) metadata.SGUID {
 		SetLocation(metadata.SGUID(id), path)
 	}
 	return metadata.SGUID(id)
+}
+
+func DeleteCard(path string) {
+	Set(path+".path", []byte(""))
 }
 
 func SetPicture(id metadata.SGUID, png []byte) {
@@ -71,16 +74,61 @@ func GetLocation(id metadata.SGUID) string {
 	return location
 }
 
-func BookImpressionOrCLick(id metadata.SGUID, log string) {
+func AddActivity(id metadata.SGUID, log string) {
 	logId := string(id) + ".activity"
-	current := string(Get(logId))
-	current = current + fmt.Sprintf("%s %s\n", time.Now().Format(time.RFC822Z), log)
-	Set(logId, []byte(current))
+	Add(logId, []byte(log))
+}
+
+func GetActivities(id metadata.SGUID) (current string) {
+	logId := string(id) + ".activity"
+	current = string(Get(logId))
+	return
+}
+
+func FindActivity(id metadata.SGUID, pattern string) (activity []string) {
+	activities := GetActivities(id)
+	patterns := strings.Split(pattern, "%s")
+	index := 0
+	activity = []string{}
+	for index != -1 {
+		index = strings.Index(activities[index:], patterns[0])
+		if index == -1 {
+			break
+		}
+		end := strings.Index(activities[index+1:], patterns[len(patterns)-1])
+		activity = append(activity, activities[index:index+1+end+len(patterns[len(patterns)-1])])
+		index = index + 1
+	}
+	return
+}
+
+func Parse(str string, pattern string) (items []string) {
+	//func TestA(t *testing.T) {
+	//	t.Log(Parse("The color is red today and green tomorrow.", "The color is %s today and %s tomorrow."))
+	//	t.Log(Parse("The color is red today and tomorrow. blue", "The color is %s today and tomorrow. %s"))
+	//	t.Log(Parse("yellow The color is red today and tomorrow.", "%s The color is %s today and tomorrow."))
+	//}
+
+	str = "^" + str + "$"
+	patterns := strings.Split("^"+pattern+"$", "%s")
+	index := 0
+	items = []string{}
+
+	for len(patterns) > 1 {
+		next := strings.Index(str[index:], patterns[0])
+		if next == -1 {
+			break
+		}
+		end := strings.Index(str[index+next:], patterns[1])
+		items = append(items, str[index+next+len(patterns[0]):index+next+end])
+		index = index + next + end
+		patterns = patterns[1:]
+	}
+	return
 }
 
 func GetStatistics(id metadata.SGUID) (clicks, impressions int) {
-	logId := string(id) + ".activity"
-	current := string(Get(logId))
+	current := GetActivities(id)
 	clicks = strings.Count(current, "Element clicked")
 	impressions = strings.Count(current, "Element became visible")
 	return

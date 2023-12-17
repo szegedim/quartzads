@@ -1,5 +1,7 @@
 package metadata
 
+import "time"
+
 //Licensed under Creative Commons CC0.
 //
 //To the extent possible under law, the author(s) have dedicated all copyright and related and
@@ -11,3 +13,4 @@ package metadata
 var ProxySite = ""
 var Placeholder = "<!-- Placeholder for digital advertisement -->"
 var SiteName = "http://127.0.0.1:7777"
+var DefaultAdTime = 10 * time.Minute //24 * time.Hour

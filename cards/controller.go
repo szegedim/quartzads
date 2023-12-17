@@ -9,6 +9,7 @@ import (
 	"os"
 	"showmycard.com/metadata"
 	"strings"
+	"time"
 )
 
 //Licensed under Creative Commons CC0.
@@ -59,7 +60,7 @@ func Setup() {
 		if request.Method == "PUT" {
 			message, _ := io.ReadAll(request.Body)
 			split := strings.SplitN(string(message), ":", 2)
-			BookImpressionOrCLick(metadata.SGUID(split[0]), string(message))
+			AddActivity(metadata.SGUID(split[0]), string(message))
 		}
 	})
 	http.HandleFunc("/englang", func(writer http.ResponseWriter, request *http.Request) {
@@ -85,9 +86,11 @@ func Setup() {
 			http.Redirect(writer, request, redirectSite+"/paid?apikey="+apiKey, http.StatusTemporaryRedirect)
 		}
 		apiKey = request.URL.Query().Get("apikey")
+		expiry := time.Now().Add(metadata.DefaultAdTime)
 		if apiKey != "" {
 			privateKey := metadata.GenerateSGUID()
 			Set(string(privateKey), []byte(apiKey))
+			AddActivity(metadata.SGUID(apiKey), fmt.Sprintf("Card paid now will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
 			http.Redirect(writer, request, "/rp?apikey="+string(privateKey), http.StatusTemporaryRedirect)
 		}
 	})
@@ -222,12 +225,32 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	for i := 0; i < placeholders; i++ {
 		name := fmt.Sprintf("card%04d", i)
 		cardId := NewCard(req.URL.Path + "#" + name)
+		expiries := FindActivity(cardId, "Card paid now will expire on %s and revert to ad.")
+		expiryLog := ""
+		for _, item := range expiries {
+			expiry := Parse(item, "Card paid now will expire on %s and revert to ad.")
+			if len(expiry) > 0 {
+				t, err := time.Parse(time.RFC822Z, expiry[0])
+				if err == nil {
+					if t.After(time.Now()) {
+						expiryLog = fmt.Sprintf("<!--Expiry of %s is in %s seconds.-->\n", cardId, t.Sub(time.Now()))
+					} else {
+						expiryLog = fmt.Sprintf("<!--Expiry of %s was in %s seconds.-->\n", cardId, time.Now().Sub(t))
+						AddActivity(cardId, string(cardId)+": Card expired.")
+						DeleteCard(req.URL.Path + "#" + name)
+						cardId = NewCard(req.URL.Path + "#" + name)
+					}
+				}
+			}
+		}
+
 		target := GetTarget(cardId)
 		card := fmt.Sprintf(`
 		<div class="showmycard" aria-label="Description of the image">
+			%s
 			<img class="showmycardimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
 		</div>
-		`, cardId, "/png?apikey="+cardId, target)
+		`, expiryLog, cardId, "/png?apikey="+cardId, target)
 		contentWithCards = strings.Replace(contentWithCards, metadata.Placeholder, card, 1)
 	}
 	base, _ := os.ReadFile("./res/testcard.html")

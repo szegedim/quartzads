@@ -48,6 +48,26 @@ func Set(key string, value []byte) {
 	}()
 }
 
+func Add(key string, value []byte) {
+	singleton()
+	lock.Lock()
+	defer lock.Unlock()
+
+	current, ok := redis[key]
+	if !ok {
+		current = persistedGet(key)
+		if current == nil {
+			current = make([]byte, 0)
+		}
+	}
+	appendtTo := bytes.NewBuffer(current)
+	appendtTo.Write(value)
+	redis[key] = appendtTo.Bytes()
+	go func() {
+		persistedSet(key, appendtTo.Bytes())
+	}()
+}
+
 func Get(key string) (value []byte) {
 	singleton()
 	lock.Lock()
