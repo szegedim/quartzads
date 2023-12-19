@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"showmycard.com/englang"
 	"showmycard.com/metadata"
 	"strings"
 	"time"
@@ -23,7 +24,7 @@ import (
 func Setup() {
 	http.HandleFunc("/png", func(writer http.ResponseWriter, request *http.Request) {
 		apiKey := request.URL.Query().Get("apikey")
-		_, _ = io.Copy(writer, bytes.NewBuffer(GetPicture(metadata.SGUID(apiKey))))
+		_, _ = io.Copy(writer, bytes.NewBuffer(GetPicture(englang.SGUID(apiKey))))
 	})
 	http.HandleFunc("/logo.png", func(writer http.ResponseWriter, request *http.Request) {
 		writer.Header().Set("Content-Type", "image/png")
@@ -37,6 +38,26 @@ func Setup() {
 			return
 		}
 		return
+	})
+	http.HandleFunc("/bids", func(writer http.ResponseWriter, request *http.Request) {
+		privateKey := request.URL.Query().Get("apikey")
+		apiKey := string(Get(privateKey))
+		if apiKey != "" {
+			// TODO list uptime, impressions and clicks
+			// TODO Security allows to hide/enable ads here.
+			buf, _ := os.ReadFile("./res/testbids.html")
+			items := englang.Englang(string(buf), "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
+			if len(items) == 3 {
+				_, _ = io.WriteString(writer, items[0])
+				for k, _ := range redis {
+					png := GetPicture(englang.SGUID(k))
+					if len(png) > 0 {
+						_, _ = io.WriteString(writer, strings.ReplaceAll(items[1], "img.png", "/png?apikey="+k))
+					}
+				}
+				_, _ = io.WriteString(writer, items[2])
+			}
+		}
 	})
 	http.HandleFunc("/up", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method == "GET" {
@@ -60,7 +81,7 @@ func Setup() {
 		if request.Method == "PUT" {
 			message, _ := io.ReadAll(request.Body)
 			split := strings.SplitN(string(message), ":", 2)
-			AddActivity(metadata.SGUID(split[0]), string(message))
+			AddActivity(englang.SGUID(split[0]), string(message))
 		}
 	})
 	http.HandleFunc("/englang", func(writer http.ResponseWriter, request *http.Request) {
@@ -88,9 +109,9 @@ func Setup() {
 		apiKey = request.URL.Query().Get("apikey")
 		expiry := time.Now().Add(metadata.DefaultAdTime)
 		if apiKey != "" {
-			privateKey := metadata.GenerateSGUID()
+			privateKey := englang.GenerateSGUID()
 			Set(string(privateKey), []byte(apiKey))
-			AddActivity(metadata.SGUID(apiKey), fmt.Sprintf("Card paid now will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
+			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card paid now will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
 			http.Redirect(writer, request, "/rp?apikey="+string(privateKey), http.StatusTemporaryRedirect)
 		}
 	})
@@ -122,13 +143,13 @@ func Setup() {
 		_, _ = io.Copy(&png, file)
 
 		apiKey := request.URL.Query().Get("apikey")
-		SetPicture(metadata.SGUID(apiKey), png.Bytes())
+		SetPicture(englang.SGUID(apiKey), png.Bytes())
 
 		message := request.FormValue("message")
 		var url string
 		_, _ = fmt.Sscanf(message, "Point the ad card to %s and inject ads.", &url)
 		if len(url) > 4 {
-			SetTarget(metadata.SGUID(apiKey), url)
+			SetTarget(englang.SGUID(apiKey), url)
 			// TODO cleanup after 24 hours
 		}
 	})
@@ -143,13 +164,13 @@ func handleReport(writer http.ResponseWriter, request *http.Request) bool {
 		defer form.Close()
 		buf := bytes.Buffer{}
 		_, _ = io.Copy(&buf, form)
-		target := GetTarget(metadata.SGUID(apiKey))
+		target := GetTarget(englang.SGUID(apiKey))
 		s0 := strings.ReplaceAll(buf.String(), "https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a", target)
 		s0 = strings.ReplaceAll(s0, "f7e77596ddf4b12e38e469421d78f3cc.png", "/png?apikey="+apiKey)
 		begin := strings.Index(s0, "<!-- Data begins here -->")
 		end := strings.Index(s0, "<!-- Data ends here -->")
 		if begin != -1 && end != -1 {
-			clicks, impressions := GetStatistics(metadata.SGUID(apiKey))
+			clicks, impressions := GetStatistics(englang.SGUID(apiKey))
 			clickbar := clicks
 			if clickbar > 60 {
 				clickbar = 60
@@ -166,7 +187,7 @@ func handleReport(writer http.ResponseWriter, request *http.Request) bool {
 				`
 			s0 = strings.ReplaceAll(s0, s0[begin:end+len("<!-- Data ends here -->")], fmt.Sprintf(pattern, 85-impressionbar, impressionbar, 85-clickbar, clickbar, 96, impressions, 96, clicks))
 		}
-		s0 = strings.ReplaceAll(s0, "<!-- Location goes here -->", "<a href=\""+GetLocation(metadata.SGUID(apiKey))+"\">Paid media</a>")
+		s0 = strings.ReplaceAll(s0, "<!-- Location goes here -->", "<a href=\""+GetLocation(englang.SGUID(apiKey))+"\">Paid media</a>")
 		buffered := bufio.NewWriter(writer)
 		_, _ = buffered.WriteString(s0)
 		_ = buffered.Flush()
@@ -223,26 +244,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	}
 
 	for i := 0; i < placeholders; i++ {
-		name := fmt.Sprintf("card%04d", i)
-		cardId := NewCard(req.URL.Path + "#" + name)
-		expiries := FindActivity(cardId, "Card paid now will expire on %s and revert to ad.")
-		expiryLog := ""
-		for _, item := range expiries {
-			expiry := Parse(item, "Card paid now will expire on %s and revert to ad.")
-			if len(expiry) > 0 {
-				t, err := time.Parse(time.RFC822Z, expiry[0])
-				if err == nil {
-					if t.After(time.Now()) {
-						expiryLog = fmt.Sprintf("<!--Expiry of %s is in %s seconds.-->\n", cardId, t.Sub(time.Now()))
-					} else {
-						expiryLog = fmt.Sprintf("<!--Expiry of %s was in %s seconds.-->\n", cardId, time.Now().Sub(t))
-						AddActivity(cardId, string(cardId)+": Card expired.")
-						DeleteCard(req.URL.Path + "#" + name)
-						cardId = NewCard(req.URL.Path + "#" + name)
-					}
-				}
-			}
-		}
+		cardId, expiryLog := GetCard(req.URL.Path, i)
 
 		target := GetTarget(cardId)
 		card := fmt.Sprintf(`

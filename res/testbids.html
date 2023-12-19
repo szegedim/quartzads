@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Licensed under Creative Commons CC0.-->
+  <!--     To the extent possible under law, the author(s) have dedicated all copyright and related and-->
+  <!-- neighboring rights to this software to the public domain worldwide.-->
+  <!--     This software is distributed without any warranty.-->
+  <!--     You should have received a copy of the CC0 Public Domain Dedication along with this software.-->
+  <!--     If not, see <https://creativecommons.org/publicdomain/zero/1.0/legalcode>.-->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Show My Card℠</title>
+  <style>
+    .showmycard-description {
+      text-align: center;
+    }
+    .showmycard-container {
+      font-family: system-ui;
+      color: darkslategray;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .showmycard {
+      position: relative;
+      justify-content: center;
+      align-items: center;
+      display: inline-block;
+      border: 4px solid darkorchid;
+      margin: 20px;
+    }
+    .showmycard::after {
+      font-family: system-ui;
+      font-size: small;
+      content: 'demo.showmycard.com℠';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard::before {
+      font-family: system-ui;
+      font-size: small;
+      content: '🍁 Sponsored by';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px;
+      background: transparent;
+      color: darkorchid;
+    }
+    .showmycard img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    body {
+      font-family: system-ui;
+      color: lightgray;
+      margin: 0;
+      padding: 20px;
+      background: darkorchid;
+    }
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="text"],
+    input[type="file"] {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+    }
+    input[type="submit"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: darkorchid;
+      color: white;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background: darkred;
+    }
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(1000px, 1fr));
+      gap: 0.5cm;
+      padding: 0.5cm;
+    }
+    .image-item img {
+      width: 1in;
+      height: 1in;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <div class="showmycard-description">
+    <h1>Spot Market</h1>
+    <p>This is a report on all live advertisement cards on this site.</p>
+  </div>
+  <div class="image-gallery">
+    <!-- Repeat this for all cards -->
+    <div class="image-item">
+      <img src="img.png" alt="Image Description">
+    </div>
+    <!-- ... -->
+  </div>
+</body>

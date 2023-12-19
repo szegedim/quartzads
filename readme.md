@@ -55,10 +55,7 @@ If not, see https://creativecommons.org/publicdomain/zero/1.0/legalcode.
 # TODO
 
 - Payment integration and refunds
-- Make some keys private upon payment
-- Redis integration
-- Stop ads after 24 hours with redis
 - Search across peer sites
-- Full reporting
-- Isolated security
+- Full spot bid reporting w/ impressions, clicks, uptime
 - Malicious Content Blocking
+- Redis integration
