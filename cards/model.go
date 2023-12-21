@@ -36,10 +36,10 @@ func DeleteCard(path string) {
 func GetCard(path string, i int) (englang.SGUID, string) {
 	name := fmt.Sprintf("card%04d", i)
 	cardId := NewCard(path + "#" + name)
-	expiries := FindActivity(cardId, "Card paid now will expire on %s and revert to ad.")
+	expiries := FindActivity(cardId, "Card will expire on %s and revert to ad.")
 	expiryLog := ""
 	for _, item := range expiries {
-		expiry := englang.Englang(item, "Card paid now will expire on %s and revert to ad.")
+		expiry := englang.Englang(item, "Card will expire on %s and revert to ad.")
 		if len(expiry) > 0 {
 			t, err := time.Parse(time.RFC822Z, expiry[0])
 			if err == nil {
@@ -116,7 +116,7 @@ func FindActivity(id englang.SGUID, pattern string) (activity []string) {
 	index := 0
 	activity = []string{}
 	for index != -1 {
-		index = strings.Index(activities[index:], patterns[0])
+		index = strings.LastIndex(activities[index:], patterns[0])
 		if index == -1 {
 			break
 		}

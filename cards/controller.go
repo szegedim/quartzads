@@ -22,6 +22,12 @@ import (
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
 
 func Setup() {
+	billing := os.Getenv("PAYMENTURL")
+	if billing == "" {
+		// Localhost test behavior running in
+		metadata.DefaultAdTime = metadata.TestAdTime
+		metadata.DefaultPurchaseTime = metadata.TestPurchaseTime
+	}
 	http.HandleFunc("/png", func(writer http.ResponseWriter, request *http.Request) {
 		apiKey := request.URL.Query().Get("apikey")
 		_, _ = io.Copy(writer, bytes.NewBuffer(GetPicture(englang.SGUID(apiKey))))
@@ -107,16 +113,30 @@ func Setup() {
 			http.Redirect(writer, request, redirectSite+"/paid?apikey="+apiKey, http.StatusTemporaryRedirect)
 		}
 		apiKey = request.URL.Query().Get("apikey")
-		expiry := time.Now().Add(metadata.DefaultAdTime)
 		if apiKey != "" {
 			privateKey := englang.GenerateSGUID()
 			Set(string(privateKey), []byte(apiKey))
-			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card paid now will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
+			expiry := time.Now().Add(metadata.DefaultAdTime)
+			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
 			http.Redirect(writer, request, "/rp?apikey="+string(privateKey), http.StatusTemporaryRedirect)
 		}
 	})
+	http.HandleFunc("/pg18", func(writer http.ResponseWriter, request *http.Request) {
+		apiKey := request.URL.Query().Get("apikey")
+		if apiKey != "" {
+			png, _ := os.ReadFile("res/noncompliant.png")
+			SetPicture(englang.SGUID(apiKey), png)
+		}
+	})
 	http.HandleFunc("/ad", func(writer http.ResponseWriter, request *http.Request) {
+		apiKey := request.URL.Query().Get("apikey")
 		if request.Method == "GET" {
+			expiry := time.Now().Add(metadata.DefaultPurchaseTime)
+			png, _ := os.ReadFile("res/waitingwithmessage.png")
+			SetPicture(englang.SGUID(apiKey), png)
+			SetTarget(englang.SGUID(apiKey), ".")
+			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
+
 			form, _ := os.Open("res/testupload.html")
 			defer form.Close()
 
@@ -124,7 +144,7 @@ func Setup() {
 			if billing != "" {
 				buf := bytes.Buffer{}
 				_, _ = io.Copy(&buf, form)
-				ret := strings.ReplaceAll(buf.String(), "https://buy.stripe.com/test_5kA4gMaZYaiY3JK8ww", billing)
+				ret := strings.ReplaceAll(buf.String(), "https://buy.stripe.com/test_00gfZueca62I1BC9AB", billing)
 				_, _ = io.WriteString(writer, ret)
 			} else {
 				_, _ = io.Copy(writer, form)
@@ -142,7 +162,6 @@ func Setup() {
 		png := bytes.Buffer{}
 		_, _ = io.Copy(&png, file)
 
-		apiKey := request.URL.Query().Get("apikey")
 		SetPicture(englang.SGUID(apiKey), png.Bytes())
 
 		message := request.FormValue("message")
@@ -150,7 +169,8 @@ func Setup() {
 		_, _ = fmt.Sscanf(message, "Point the ad card to %s and inject ads.", &url)
 		if len(url) > 4 {
 			SetTarget(englang.SGUID(apiKey), url)
-			// TODO cleanup after 24 hours
+		} else {
+			SetTarget(englang.SGUID(apiKey), ".")
 		}
 	})
 	http.HandleFunc("/", proxyCore)
@@ -247,12 +267,17 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 		cardId, expiryLog := GetCard(req.URL.Path, i)
 
 		target := GetTarget(cardId)
+		report := fmt.Sprintf("<button style=\"position:absolute;top:90%%;right:1%%;opacity:70%%;font-size: xx-small;text-align: right;color: darkorchid;font-family: system-ui\" onclick=\"fetch('%s');location.reload();\">Report</button>", "/pg18?apikey="+cardId)
+		if strings.HasPrefix(target, "/") {
+			report = ""
+		}
 		card := fmt.Sprintf(`
 		<div class="showmycard" aria-label="Description of the image">
 			%s
 			<img class="showmycardimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
+			%s
 		</div>
-		`, expiryLog, cardId, "/png?apikey="+cardId, target)
+		`, expiryLog, cardId, "/png?apikey="+cardId, target, report)
 		contentWithCards = strings.Replace(contentWithCards, metadata.Placeholder, card, 1)
 	}
 	base, _ := os.ReadFile("./res/testcard.html")

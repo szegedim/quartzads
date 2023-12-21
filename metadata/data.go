@@ -10,7 +10,13 @@ import "time"
 //You should have received a copy of the CC0 Public Domain Dedication along with this software.
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
 
+var TestSiteName = "http://127.0.0.1:7777"
+var TestAdTime = 10 * time.Minute
+var TestPurchaseTime = 2 * time.Minute
+
 var ProxySite = ""
 var Placeholder = "<!-- Placeholder for digital advertisement -->"
-var SiteName = "http://127.0.0.1:7777"
-var DefaultAdTime = 10 * time.Minute //24 * time.Hour
+var SiteName = TestSiteName
+
+var DefaultAdTime = 24 * time.Hour
+var DefaultPurchaseTime = 10 * time.Minute
