@@ -132,7 +132,7 @@ func Setup() {
 		apiKey := request.URL.Query().Get("apikey")
 		if request.Method == "GET" {
 			expiry := time.Now().Add(metadata.DefaultPurchaseTime)
-			png, _ := os.ReadFile("res/waitingwithmessage.png")
+			png, _ := os.ReadFile("res/beingedited.png")
 			SetPicture(englang.SGUID(apiKey), png)
 			SetTarget(englang.SGUID(apiKey), ".")
 			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
