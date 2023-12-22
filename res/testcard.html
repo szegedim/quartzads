@@ -54,13 +54,14 @@
 <!-- Script starts here -->
 <script>
     const clicked = function (elem, url) {
-        let utms = '?utm_source='+elem.id+'&utm_medium=showmycardcom&utm_campaign=funding2023'+'&utm_content=sitename'
-
-        if (url.indexOf('?')!==-1) {
-            utms = '&'+utms.substring(1)
-        }
         if (url.indexOf('utm_source')===-1) {
-            url = url+utms
+            let utms = '?utm_source='+elem.id+'&utm_medium=showmycardcom&utm_campaign=funding2023'+'&utm_content=sitename'
+            if (url.indexOf('?')!==-1) {
+                utms = '&'+utms.substring(1)
+            }
+            if (url.indexOf('utm_source')===-1) {
+                url = url+utms
+            }
         }
         window.open(url,'_self');
         let englang = elem.id+': Element clicked forwarding to ' + url + ' now.'
