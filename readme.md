@@ -54,7 +54,6 @@ If not, see https://creativecommons.org/publicdomain/zero/1.0/legalcode.
 
 # TODO
 
-- Follow common utm tags
 - Payment integration and refunds
 - Search across peer sites
 - Full spot bid reporting w/ impressions, clicks, uptime
