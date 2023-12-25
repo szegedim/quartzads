@@ -1,9 +1,9 @@
 package main
 
 import (
+	"gitlab.com/eper.io/quartzads/cards"
 	"log"
 	"net/http"
-	"showmycard.com/cards"
 )
 
 //Licensed under Creative Commons CC0.

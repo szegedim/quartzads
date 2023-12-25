@@ -2,8 +2,8 @@ package cards
 
 import (
 	"fmt"
+	"gitlab.com/eper.io/quartzads/englang"
 	"os"
-	"showmycard.com/englang"
 	"strings"
 	"time"
 )

@@ -1,4 +1,4 @@
-module showmycard.com
+module gitlab.com/eper.io/quartzads
 
 //Licensed under Creative Commons CC0.
 //

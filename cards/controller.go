@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"gitlab.com/eper.io/quartzads/englang"
+	"gitlab.com/eper.io/quartzads/metadata"
 	"io"
 	"net/http"
 	"os"
-	"showmycard.com/englang"
-	"showmycard.com/metadata"
 	"strings"
 	"time"
 )
@@ -52,7 +52,8 @@ func Setup() {
 			// TODO list uptime, impressions and clicks
 			// TODO Security allows to hide/enable ads here.
 			buf, _ := os.ReadFile("./res/testbids.html")
-			items := englang.Englang(string(buf), "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
+			ret := Customize(string(buf))
+			items := englang.Englang(ret, "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
 			if len(items) == 3 {
 				_, _ = io.WriteString(writer, items[0])
 				for k, _ := range redis {
@@ -67,9 +68,9 @@ func Setup() {
 	})
 	http.HandleFunc("/up", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method == "GET" {
-			form, _ := os.Open("./res/testsetup.html")
-			defer form.Close()
-			_, _ = io.Copy(writer, form)
+			form, _ := os.ReadFile("./res/testsetup.html")
+			s0 := Customize(string(form))
+			_, _ = io.WriteString(writer, s0)
 			return
 		}
 
@@ -137,17 +138,16 @@ func Setup() {
 			SetTarget(englang.SGUID(apiKey), ".")
 			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
 
-			form, _ := os.Open("res/testupload.html")
-			defer form.Close()
+			form, _ := os.ReadFile("res/testupload.html")
+			s0 := Customize(string(form))
 
 			billing := os.Getenv("PAYMENTURL")
 			if billing != "" {
-				buf := bytes.Buffer{}
-				_, _ = io.Copy(&buf, form)
-				ret := strings.ReplaceAll(buf.String(), "https://buy.stripe.com/test_00gfZueca62I1BC9AB", billing)
+				ret := strings.ReplaceAll(s0, "https://buy.stripe.com/test_00gfZueca62I1BC9AB", billing)
+				ret = Customize(ret)
 				_, _ = io.WriteString(writer, ret)
 			} else {
-				_, _ = io.Copy(writer, form)
+				_, _ = io.WriteString(writer, s0)
 			}
 			return
 		}
@@ -176,6 +176,14 @@ func Setup() {
 	http.HandleFunc("/", proxyCore)
 }
 
+func Customize(ret string) string {
+	title := os.Getenv("SITETITLE")
+	if title != "" {
+		ret = strings.ReplaceAll(ret, "Show My Card℠", title)
+	}
+	return ret
+}
+
 func handleReport(writer http.ResponseWriter, request *http.Request) bool {
 	privateKey := request.URL.Query().Get("apikey")
 	apiKey := string(Get(privateKey))
@@ -185,7 +193,8 @@ func handleReport(writer http.ResponseWriter, request *http.Request) bool {
 		buf := bytes.Buffer{}
 		_, _ = io.Copy(&buf, form)
 		target := GetTarget(englang.SGUID(apiKey))
-		s0 := strings.ReplaceAll(buf.String(), "https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a", target)
+		s0 := Customize(buf.String())
+		s0 = strings.ReplaceAll(s0, "https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a", target)
 		s0 = strings.ReplaceAll(s0, "f7e77596ddf4b12e38e469421d78f3cc.png", "/png?apikey="+apiKey)
 		begin := strings.Index(s0, "<!-- Data begins here -->")
 		end := strings.Index(s0, "<!-- Data ends here -->")
@@ -282,6 +291,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	}
 	base, _ := os.ReadFile("./res/testcard.html")
 	baseString := string(base)
+	baseString = Customize(baseString)
 	beginHeader := strings.Index(baseString, "<!-- Style starts here -->")
 	endHeader := strings.Index(baseString, "<!-- Style ends here -->")
 	contentWithCards = strings.ReplaceAll(contentWithCards, "</head>", baseString[beginHeader:endHeader+len("<!-- Style ends here -->")]+"</head>")
