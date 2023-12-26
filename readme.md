@@ -1,6 +1,6 @@
 # QuartzAds
 
-## Advertising Technology behind showmycard.com℠
+## Advertising Technology behind www.showmycard.com℠
 
 # Summary
 
@@ -43,7 +43,29 @@ Create a AWS account and run the docker container `schmiedent/quartzads` as an A
 
 Launch it on a VM.
 
-You will need changes and some security setup to go production. Create a billing page on stripe.com and set the url to `PAYMENTURL`. Update `SITETITLE` with your desired site name. For more info go to hq@schmied.us
+You will need changes and some security setup to go production.
+
+Create a billing page on stripe.com note the Url.
+
+Write an implementation configuration file like the following.
+```
+Set the payment url to https://buy.stripe.com/test_00gfZueca62I1BC9AB address.
+Set the title to Digital Marketing text.
+```
+
+Place it to a hard to guess location like
+```
+https://www.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
+```
+
+Update the environment variables to use this url at startup.
+```bash
+export IMPLEMENTATION=https://www.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
+```
+
+The defaults point to a WordPress site created by us proving that the target market potential of content is almost the entire internet.
+
+For more info go to hq@schmied.us
 
 # Warranty And License
 

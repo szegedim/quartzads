@@ -33,7 +33,7 @@
     .showmycard::after {
       font-family: system-ui;
       font-size: small;
-      content: 'demo.showmycard.com℠';
+      content: 'www.showmycard.com℠';
       position: absolute;
       top: 100%;
       left: 50%;
@@ -109,7 +109,7 @@
 <div class="container">
   <h2>Show My Card℠. Advertisement Technology.</h2>
   <ul>This is a simple paid media demonstration.</ul>
-  <ul>The card as is displayed for 24 hours.</ul>
+  <ul>The card is displayed for 24 hours.</ul>
   <ul>The selected slot with the context does not change.</ul>
   <ul>You will get a link to monitor the results.</ul>
   <ul>Ask for a refund, if not satisfied with the service.</ul>
@@ -179,7 +179,6 @@
       })
       .then(data => {
         window.open('https://buy.stripe.com/test_00gfZueca62I1BC9AB' + window.location.search.toString(), '_self')
-        //window.open(window.location.toString().replace('/ad','/rp'),'_self')
       })
       .catch(error => {
         console.error('Error:', error);

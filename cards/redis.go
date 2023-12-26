@@ -31,7 +31,7 @@ func singleton() {
 	//		client := redis0.NewClient(opt)
 	//
 	//		ctx := context.Background()
-	//		val, _ := client.Get(ctx, "showmycard.com").Result()
+	//		val, _ := client.Get(ctx, "www.showmycard.com").Result()
 	//		fmt.Println(val)
 	//	}
 	//}()

@@ -3,6 +3,7 @@ package cards
 import (
 	"fmt"
 	"gitlab.com/eper.io/quartzads/englang"
+	"gitlab.com/eper.io/quartzads/metadata"
 	"os"
 	"strings"
 	"time"
@@ -33,13 +34,23 @@ func DeleteCard(path string) {
 	Set(path+".path", []byte(""))
 }
 
+func LockAd(apiKey string) {
+	if strings.HasPrefix(GetTarget(englang.SGUID(apiKey)), "/ad") {
+		expiry := time.Now().Add(metadata.DefaultPurchaseTime)
+		png, _ := os.ReadFile("res/beingedited.png")
+		SetPicture(englang.SGUID(apiKey), png)
+		SetTarget(englang.SGUID(apiKey), ".")
+		AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
+	}
+}
+
 func GetCard(path string, i int) (englang.SGUID, string) {
 	name := fmt.Sprintf("card%04d", i)
 	cardId := NewCard(path + "#" + name)
 	expiries := FindActivity(cardId, "Card will expire on %s and revert to ad.")
 	expiryLog := ""
 	for _, item := range expiries {
-		expiry := englang.Englang(item, "Card will expire on %s and revert to ad.")
+		expiry := englang.SplitEnglang(item, "Card will expire on %s and revert to ad.")
 		if len(expiry) > 0 {
 			t, err := time.Parse(time.RFC822Z, expiry[0])
 			if err == nil {

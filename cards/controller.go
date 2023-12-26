@@ -22,12 +22,13 @@ import (
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
 
 func Setup() {
-	billing := os.Getenv("PAYMENTURL")
-	if billing == "" {
-		// Localhost test behavior running in
-		metadata.DefaultAdTime = metadata.TestAdTime
-		metadata.DefaultPurchaseTime = metadata.TestPurchaseTime
-	}
+	implementation := os.Getenv("IMPLEMENTATION")
+	englang.RunEnglang(implementation)
+
+	http.HandleFunc("/1223c99f-70fe-40be-abe3-bf1c6ba1bdb6.txt", func(writer http.ResponseWriter, request *http.Request) {
+		ret := englang.GenerateEnglang()
+		_, _ = io.WriteString(writer, ret)
+	})
 	http.HandleFunc("/png", func(writer http.ResponseWriter, request *http.Request) {
 		apiKey := request.URL.Query().Get("apikey")
 		_, _ = io.Copy(writer, bytes.NewBuffer(GetPicture(englang.SGUID(apiKey))))
@@ -53,7 +54,7 @@ func Setup() {
 			// TODO Security allows to hide/enable ads here.
 			buf, _ := os.ReadFile("./res/testbids.html")
 			ret := Customize(string(buf))
-			items := englang.Englang(ret, "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
+			items := englang.SplitEnglang(ret, "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
 			if len(items) == 3 {
 				_, _ = io.WriteString(writer, items[0])
 				for k, _ := range redis {
@@ -77,7 +78,7 @@ func Setup() {
 		message := request.FormValue("message")
 		if message != "" {
 			proxy := ""
-			_, _ = fmt.Sscanf(message, "Add advertisement to %s page that you have rights to.", &proxy)
+			_, _ = fmt.Sscanf(message, "Add advertisement to %s page. Make sure that you have copyright.", &proxy)
 			if proxy != "" {
 				metadata.ProxySite = proxy
 			}
@@ -132,18 +133,13 @@ func Setup() {
 	http.HandleFunc("/ad", func(writer http.ResponseWriter, request *http.Request) {
 		apiKey := request.URL.Query().Get("apikey")
 		if request.Method == "GET" {
-			expiry := time.Now().Add(metadata.DefaultPurchaseTime)
-			png, _ := os.ReadFile("res/beingedited.png")
-			SetPicture(englang.SGUID(apiKey), png)
-			SetTarget(englang.SGUID(apiKey), ".")
-			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))
+			LockAd(apiKey)
 
 			form, _ := os.ReadFile("res/testupload.html")
 			s0 := Customize(string(form))
 
-			billing := os.Getenv("PAYMENTURL")
-			if billing != "" {
-				ret := strings.ReplaceAll(s0, "https://buy.stripe.com/test_00gfZueca62I1BC9AB", billing)
+			if metadata.PaymentUrl != "" {
+				ret := strings.ReplaceAll(s0, "https://buy.stripe.com/test_00gfZueca62I1BC9AB", metadata.PaymentUrl)
 				ret = Customize(ret)
 				_, _ = io.WriteString(writer, ret)
 			} else {
@@ -177,9 +173,18 @@ func Setup() {
 }
 
 func Customize(ret string) string {
-	title := os.Getenv("SITETITLE")
-	if title != "" {
-		ret = strings.ReplaceAll(ret, "Show My Card℠", title)
+	if metadata.SiteTitle != "" {
+		ret = strings.ReplaceAll(ret, "Show My Card℠", metadata.SiteTitle)
+	}
+	if metadata.ProxySite != "" {
+		ret = strings.ReplaceAll(ret, "https://hq45a13f0d8b0f0.wordpress.com", metadata.ProxySite)
+	}
+	if metadata.DefaultAdTime.Hours() > 1 {
+		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", fmt.Sprintf("The card is displayed for %00.1f hours.", metadata.DefaultAdTime.Hours()))
+	} else if metadata.DefaultAdTime.Minutes() > 1 {
+		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", fmt.Sprintf("The card is displayed for %00.1f minutes.", metadata.DefaultAdTime.Minutes()))
+	} else {
+		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", "The card is displayed for some time.")
 	}
 	return ret
 }
