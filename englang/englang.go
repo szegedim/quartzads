@@ -1,7 +1,6 @@
 package englang
 
 import (
-	"bytes"
 	"fmt"
 	"gitlab.com/eper.io/quartzads/metadata"
 	"io"
@@ -43,7 +42,7 @@ func SplitEnglang(str string, pattern string) (items []string) {
 }
 
 func RunEnglang(instructions string) {
-	s := GenerateEnglang()
+	s := metadata.GetDefaultImplementation()
 	response, err := http.Get(instructions)
 	if err == nil && response != nil && response.Body != nil {
 		defer response.Body.Close()
@@ -65,26 +64,18 @@ func RunEnglang(instructions string) {
 		if len(tokens) > 0 {
 			metadata.ProxySite = tokens[0]
 		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Point contact to %s site.")
+		if len(tokens) > 0 {
+			metadata.Contact = tokens[0]
+		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Point terms to %s site.")
+		if len(tokens) > 0 {
+			metadata.Terms = tokens[0]
+		}
 	}
 	if metadata.PaymentUrl == "" {
 		// Localhost test behavior running in
 		metadata.DefaultAdTime = metadata.TestAdTime
 		metadata.DefaultPurchaseTime = metadata.TestPurchaseTime
 	}
-}
-
-func GenerateEnglang() string {
-	buf := bytes.Buffer{}
-	if metadata.TestPaymentUrl != "" {
-		buf.WriteString(fmt.Sprintf("Set the payment url to %s address.", metadata.TestPaymentUrl))
-		buf.WriteByte('\n')
-	}
-	buf.WriteString(fmt.Sprintf("Set the title to %s text.", metadata.TestTitle))
-	buf.WriteByte('\n')
-	if metadata.TestSite != "" {
-		buf.WriteString(fmt.Sprintf("Proxy the %s site.", metadata.TestSite))
-		buf.WriteByte('\n')
-	}
-
-	return buf.String()
 }

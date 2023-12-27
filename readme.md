@@ -50,7 +50,8 @@ Create a billing page on stripe.com note the Url.
 Write an implementation configuration file like the following.
 ```
 Set the payment url to https://buy.stripe.com/test_00gfZueca62I1BC9AB address.
-Set the title to Digital Marketing text.
+Set the title to Support Wildlife text.
+Proxy the https://www.worldwildlife.org site.
 ```
 
 Place it to a hard to guess location like

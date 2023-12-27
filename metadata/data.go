@@ -1,6 +1,10 @@
 package metadata
 
-import "time"
+import (
+	"bytes"
+	"fmt"
+	"time"
+)
 
 //Licensed under Creative Commons CC0.
 //
@@ -23,6 +27,24 @@ var Placeholder = "<!-- Placeholder for digital advertisement -->"
 var SiteName = TestSiteAddress
 var PaymentUrl = ""
 var SiteTitle = ""
+var Terms = ""
+var Contact = ""
 
 var DefaultAdTime = 24 * time.Hour
 var DefaultPurchaseTime = 10 * time.Minute
+
+func GetDefaultImplementation() string {
+	buf := bytes.Buffer{}
+	if TestPaymentUrl != "" {
+		buf.WriteString(fmt.Sprintf("Set the payment url to %s address.", TestPaymentUrl))
+		buf.WriteByte('\n')
+	}
+	buf.WriteString(fmt.Sprintf("Set the title to %s text.", TestTitle))
+	buf.WriteByte('\n')
+	if TestSite != "" {
+		buf.WriteString(fmt.Sprintf("Proxy the %s site.", TestSite))
+		buf.WriteByte('\n')
+	}
+
+	return buf.String()
+}

@@ -26,7 +26,7 @@ func Setup() {
 	englang.RunEnglang(implementation)
 
 	http.HandleFunc("/1223c99f-70fe-40be-abe3-bf1c6ba1bdb6.txt", func(writer http.ResponseWriter, request *http.Request) {
-		ret := englang.GenerateEnglang()
+		ret := metadata.GetDefaultImplementation()
 		_, _ = io.WriteString(writer, ret)
 	})
 	http.HandleFunc("/png", func(writer http.ResponseWriter, request *http.Request) {
@@ -267,7 +267,13 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	contentWithCards := string(content)
 
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
-	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🍁(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+	if metadata.Contact != "" {
+		adBlocker = strings.Replace(adBlocker, "</p></div>", fmt.Sprintf(" Ad Contact <a href=\"%s\">(hop)</a>", metadata.Contact)+"</p></div>", 1)
+	}
+	if metadata.Terms != "" {
+		adBlocker = strings.Replace(adBlocker, "</p></div>", fmt.Sprintf(" Ad Terms <a href=\"%s\">(hop)</a>", metadata.Terms)+"</p></div>", 1)
+	}
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
 		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
@@ -294,6 +300,12 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 		`, expiryLog, cardId, "/png?apikey="+cardId, target, report)
 		contentWithCards = strings.Replace(contentWithCards, metadata.Placeholder, card, 1)
 	}
+	if metadata.SiteTitle != "" {
+		contentWithCards = strings.Replace(contentWithCards, "<title>", "<!--<title>", 1)
+		contentWithCards = strings.Replace(contentWithCards, "</title>", "</title>-->", 1)
+		contentWithCards = strings.Replace(contentWithCards, "<!--<title>", fmt.Sprintf("<title>%s</title><!--<title>", metadata.SiteTitle), 1)
+	}
+
 	base, _ := os.ReadFile("./res/testcard.html")
 	baseString := string(base)
 	baseString = Customize(baseString)
