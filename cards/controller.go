@@ -268,12 +268,15 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
 	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+
+	contact := fmt.Sprintf("Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
 	if metadata.Contact != "" {
-		adBlocker = strings.Replace(adBlocker, "</p></div>", fmt.Sprintf(" Ad Contact <a href=\"%s\">(hop)</a>", metadata.Contact)+"</p></div>", 1)
+		contact = contact + fmt.Sprintf("Contact <a href=\"%s\">(hop)</a> ", metadata.Contact)
 	}
 	if metadata.Terms != "" {
-		adBlocker = strings.Replace(adBlocker, "</p></div>", fmt.Sprintf(" Ad Terms <a href=\"%s\">(hop)</a>", metadata.Terms)+"</p></div>", 1)
+		contact = contact + fmt.Sprintf("Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
 	}
+	fmt.Println(contact)
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
 		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
@@ -320,6 +323,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	contentWithCards = strings.ReplaceAll(contentWithCards, metadata.ProxySite+req.URL.Path, req.URL.Path)
 	contentWithCards = strings.ReplaceAll(contentWithCards, "utm_content=sitename", "utm_content="+metadata.SiteName)
 
+	contentWithCards = strings.Replace(contentWithCards, "</body>", contact+"</body>", 1)
 	//if strings.HasPrefix(response.Header.Get("Content-Type"), "text/html") {
 	//	fmt.Println(contentWithCards)
 	//}
