@@ -56,7 +56,7 @@ Proxy the https://www.worldwildlife.org site.
 
 Place it to a hard to guess location like
 ```
-https://www.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
+https://demo.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
 ```
 
 Update the environment variables to use this url at startup.
