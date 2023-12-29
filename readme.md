@@ -77,7 +77,7 @@ For more info go to hq@schmied.us
 
 # Warranty And License
 
-This is a bare minimum demo. We reserve trademark and patent rights.
+This is a bare minimum demo. We reserve patent rights. We reserve showmycard.com℠. Any other trade marks and service marks in the codebase (e.g. Stripe™) are properties of their respective owners.
 
 This document is Licensed under Creative Commons CC0.
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights
