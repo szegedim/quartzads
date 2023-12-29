@@ -271,10 +271,10 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 
 	contact := fmt.Sprintf("Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
 	if metadata.Contact != "" {
-		contact = contact + fmt.Sprintf("Contact <a href=\"%s\">(hop)</a> ", metadata.Contact)
+		contact = contact + fmt.Sprintf("Ad Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
 	}
 	if metadata.Terms != "" {
-		contact = contact + fmt.Sprintf("Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
+		contact = contact + fmt.Sprintf("Ad Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
 	}
 	fmt.Println(contact)
 	if placeholders == 0 {

@@ -68,9 +68,16 @@ The defaults point to a WordPress site created by us proving that the target mar
 
 For more info go to hq@schmied.us
 
+# TODO List
+
+- Payment integration and refunds. Currently, you just leave a contact and use your payment provider.
+- Search across peer sites. This is what makes it powerful.
+- Full spot bid reporting w/ impressions, clicks, uptime. Design is usually very characteristic and individual to each user. We will probably build a paid version with our own design. Scrape `/englang` logs with Alteryx, PowerBI, Snowflake, Splunk, Tableau.
+- Finalize Redis integration. Redis can help to back up and scale with Lambdas to Big Tech levels easily. We added only stubs to streamline the codebase.
+
 # Warranty And License
 
-This is a bare minimum demo.
+This is a bare minimum demo. We reserve trademark and patent rights.
 
 This document is Licensed under Creative Commons CC0.
 To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights
@@ -78,10 +85,3 @@ to this document to the public domain worldwide.
 This document is distributed without any warranty.
 You should have received a copy of the CC0 Public Domain Dedication along with this document.
 If not, see https://creativecommons.org/publicdomain/zero/1.0/legalcode.
-
-# TODO
-
-- Payment integration and refunds
-- Search across peer sites
-- Full spot bid reporting w/ impressions, clicks, uptime
-- Redis integration
