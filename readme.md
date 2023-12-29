@@ -47,11 +47,14 @@ You will need to do changes and some security setup to go production.
 
 Create a billing page at a payment provider like stripe.com or paypal.com. Note the Url.
 
-Write an implementation configuration file like the following.
+Customize an implementation configuration file like the following.
 ```
 Set the payment url to https://buy.stripe.com/test_00gfZueca62I1BC9AB address.
 Set the title to Support Wildlife text.
 Proxy the https://www.worldwildlife.org site.
+Point contact to https://sponsored.worldwildlife.org/contact.html site.
+Point terms to https://sponsored.worldwildlife.org/termsofuse.txt site.
+
 ```
 
 Place it to a hard to guess location like this one. Lambdas and serverless functions are ideal for this purpose.
