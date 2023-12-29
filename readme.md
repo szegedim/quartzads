@@ -35,17 +35,17 @@ Example:
 
 # Usage
 
-You have a few options.
+You have a few options to test how it works.
 
-Create a DigitalOcean account and run the docker container `schmiedent/quartzads` as an app mapping port 7777.
+Create a DigitalOcean account and run the docker container `schmiedent/quartzads` as an app communicating on port 7777.
 
-Create a AWS account and run the docker container `schmiedent/quartzads` as an AWS Lambda mapping port 7777.
+Create a AWS account and run the docker container `schmiedent/quartzads` as an AWS Lambda communicating on port 7777.
 
-Launch it on a VM.
+Launch it on a virtual machine, and browse `http://127.0.0.1:7777` Get full logs in `http://127.0.0.1:7777/englang`. You can just click on an ad card to buy it.
 
-You will need changes and some security setup to go production.
+You will need to do changes and some security setup to go production.
 
-Create a billing page on stripe.com note the Url.
+Create a billing page at a payment provider like stripe.com or paypal.com. Note the Url.
 
 Write an implementation configuration file like the following.
 ```
@@ -54,7 +54,7 @@ Set the title to Support Wildlife text.
 Proxy the https://www.worldwildlife.org site.
 ```
 
-Place it to a hard to guess location like
+Place it to a hard to guess location like this one. Lambdas and serverless functions are ideal for this purpose.
 ```
 https://demo.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
 ```
@@ -64,9 +64,13 @@ Update the environment variables to use this url at startup.
 export IMPLEMENTATION=https://www.showmycard.com/bc450bc5-77ff-4492-a988-eea45bd17c12.txt
 ```
 
-The defaults point to a WordPress site created by us proving that the target market potential of content is almost the entire internet.
+The defaults point to a WordPress site created by us showing the market potential of upstream content is almost the entire internet. Make sure you buy the copyright before mirroring any site.
 
-For more info go to hq@schmied.us
+We are fundraising for this project at www.showmycard.com
+
+You can see a demo at https://demo.showmycard.com
+
+For more info contact hq@schmied.us
 
 # TODO List
 
