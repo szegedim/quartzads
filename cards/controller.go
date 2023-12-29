@@ -116,7 +116,7 @@ func Setup() {
 		}
 		apiKey = request.URL.Query().Get("apikey")
 		if apiKey != "" {
-			privateKey := englang.GenerateSGUID()
+			privateKey := "private" + englang.GenerateSGUID()
 			Set(string(privateKey), []byte(apiKey))
 			expiry := time.Now().Add(metadata.DefaultAdTime)
 			AddActivity(englang.SGUID(apiKey), fmt.Sprintf("Card will expire on %s and revert to ad.", expiry.Format(time.RFC822Z)))

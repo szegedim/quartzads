@@ -20,7 +20,7 @@ import (
 func NewCard(path string) englang.SGUID {
 	id := string(Get(path + ".path"))
 	if id == "" {
-		id = "showmycardcom" + string(englang.GenerateSGUID())
+		id = "public" + string(englang.GenerateSGUID())
 		SetTarget(englang.SGUID(id), "/ad?apikey="+id)
 		Set(path+".path", []byte(id))
 		png, _ := os.ReadFile("res/img.png")

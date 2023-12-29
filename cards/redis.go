@@ -2,6 +2,7 @@ package cards
 
 import (
 	"bytes"
+	"strings"
 	"sync"
 )
 
@@ -94,7 +95,9 @@ func List() (keys string) {
 
 	b := bytes.Buffer{}
 	for k, _ := range redis {
-		b.WriteString(k + "\n")
+		if !strings.Contains(k, "private") {
+			b.WriteString(k + "\n")
+		}
 	}
 	keys = b.String()
 	return
