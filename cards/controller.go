@@ -276,7 +276,8 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	if metadata.Terms != "" {
 		contact = contact + fmt.Sprintf("Ad Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
 	}
-	fmt.Println(contact)
+	contact = "<div style=\"text-align: center\">" + contact + "</div>"
+
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
 		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
