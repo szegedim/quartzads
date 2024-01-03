@@ -5,7 +5,9 @@ import (
 	"gitlab.com/eper.io/quartzads/metadata"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 )
 
 //Licensed under Creative Commons CC0.
@@ -72,10 +74,12 @@ func RunEnglang(instructions string) {
 		if len(tokens) > 0 {
 			metadata.Terms = tokens[0]
 		}
-	}
-	if metadata.PaymentUrl == "" {
-		// Localhost test behavior running in
-		metadata.DefaultAdTime = metadata.TestAdTime
-		metadata.DefaultPurchaseTime = metadata.TestPurchaseTime
+		tokens = SplitEnglang(strings.TrimSpace(line), "Set ad time to %s hours.")
+		if len(tokens) > 0 {
+			hours, _ := strconv.ParseInt(tokens[0], 10, 32)
+			if hours > 0 && hours < 10000 {
+				metadata.DefaultAdTime = time.Duration(hours) * time.Hour
+			}
+		}
 	}
 }

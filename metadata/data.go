@@ -16,8 +16,6 @@ import (
 
 var TestSiteAddress = "http://127.0.0.1:7777"
 var TestImplementation = "http://127.0.0.1:7777/1223c99f-70fe-40be-abe3-bf1c6ba1bdb6.txt"
-var TestAdTime = 10 * time.Minute
-var TestPurchaseTime = 2 * time.Minute
 var TestTitle = "Digital Marketing"
 var TestPaymentUrl = ""
 var TestSite = ""

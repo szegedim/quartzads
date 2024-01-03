@@ -179,7 +179,9 @@ func Customize(ret string) string {
 	if metadata.ProxySite != "" {
 		ret = strings.ReplaceAll(ret, "https://hq45a13f0d8b0f0.wordpress.com", metadata.ProxySite)
 	}
-	if metadata.DefaultAdTime.Hours() > 1 {
+	if metadata.DefaultAdTime.Hours() > 4*24 && int(metadata.DefaultAdTime.Hours())%24 == 0 {
+		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", fmt.Sprintf("The card is displayed for %00.1f days.", metadata.DefaultAdTime.Hours()/24))
+	} else if metadata.DefaultAdTime.Hours() > 1 {
 		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", fmt.Sprintf("The card is displayed for %00.1f hours.", metadata.DefaultAdTime.Hours()))
 	} else if metadata.DefaultAdTime.Minutes() > 1 {
 		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", fmt.Sprintf("The card is displayed for %00.1f minutes.", metadata.DefaultAdTime.Minutes()))
