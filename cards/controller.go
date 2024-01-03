@@ -292,9 +292,9 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 			report = ""
 		}
 		card := fmt.Sprintf(`
-		<div class="showmycard" aria-label="Description of the image">
+		<div class="quartzads" aria-label="Description of the image">
 			%s
-			<img class="showmycardimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
+			<img class="quartzadsimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
 			%s
 		</div>
 		`, expiryLog, cardId, "/png?apikey="+cardId, target, report)

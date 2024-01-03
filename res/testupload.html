@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Show My Card℠</title>
   <style>
-    .showmycard-container {
+    .quartzads-container {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -22,7 +22,7 @@
       max-width: 500px;
       margin: 40px auto;
     }
-    .showmycard {
+    .quartzads {
       position: relative;
       justify-content: center;
       align-items: center;
@@ -30,7 +30,7 @@
       border: 4px solid darkorchid;
       margin: 20px;
     }
-    .showmycard::after {
+    .quartzads::after {
       font-family: system-ui;
       font-size: small;
       content: 'www.showmycard.com℠';
@@ -42,7 +42,7 @@
       background: transparent;
       color: darkorchid;
     }
-    .showmycard::before {
+    .quartzads::before {
       font-family: system-ui;
       font-size: small;
       content: '🐞 Sponsored by';
@@ -54,7 +54,7 @@
       background: transparent;
       color: darkorchid;
     }
-    .showmycard img {
+    .quartzads img {
       display: block;
       width: 100%;
       height: auto;
@@ -123,8 +123,8 @@
     <input type="submit" value="Pay on Stripe">
   </form>
 </div>
-<div class="showmycard-container">
-  <div class="showmycard" aria-label="Description of the image">
+<div class="quartzads-container">
+  <div class="quartzads" aria-label="Description of the image">
     <img id='imagePreview' src="/logo.png" alt="Descriptive text" style="width: 3in;height: auto;" >
   </div>
 </div>
