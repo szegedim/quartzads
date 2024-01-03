@@ -136,14 +136,17 @@ func Setup() {
 			LockAd(apiKey)
 
 			form, _ := os.ReadFile("res/testupload.html")
-			s0 := Customize(string(form))
+			cardUpload := Customize(string(form))
+
+			contact := GetContactInfo()
+			cardUpload = strings.Replace(cardUpload, "</body>", contact+"</body>", 1)
 
 			if metadata.PaymentUrl != "" {
-				ret := strings.ReplaceAll(s0, "https://buy.stripe.com/test_00gfZueca62I1BC9AB", metadata.PaymentUrl)
+				ret := strings.ReplaceAll(cardUpload, "https://buy.stripe.com/test_00gfZueca62I1BC9AB", metadata.PaymentUrl)
 				ret = Customize(ret)
 				_, _ = io.WriteString(writer, ret)
 			} else {
-				_, _ = io.WriteString(writer, s0)
+				_, _ = io.WriteString(writer, cardUpload)
 			}
 			return
 		}
@@ -271,15 +274,6 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
 	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
 
-	contact := fmt.Sprintf("Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
-	if metadata.Contact != "" {
-		contact = contact + fmt.Sprintf("Ad Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
-	}
-	if metadata.Terms != "" {
-		contact = contact + fmt.Sprintf("Ad Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
-	}
-	contact = "<div style=\"text-align: center\">" + contact + "</div>"
-
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
 		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
@@ -326,10 +320,23 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	contentWithCards = strings.ReplaceAll(contentWithCards, metadata.ProxySite+req.URL.Path, req.URL.Path)
 	contentWithCards = strings.ReplaceAll(contentWithCards, "utm_content=sitename", "utm_content="+metadata.SiteName)
 
+	contact := GetContactInfo()
 	contentWithCards = strings.Replace(contentWithCards, "</body>", contact+"</body>", 1)
 	//if strings.HasPrefix(response.Header.Get("Content-Type"), "text/html") {
 	//	fmt.Println(contentWithCards)
 	//}
 	b2 := bytes.NewBufferString(contentWithCards)
 	_, _ = io.Copy(res, b2)
+}
+
+func GetContactInfo() string {
+	contact := fmt.Sprintf("Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
+	if metadata.Contact != "" {
+		contact = contact + fmt.Sprintf("Ad Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
+	}
+	if metadata.Terms != "" {
+		contact = contact + fmt.Sprintf("Ad Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
+	}
+	contact = "<div style=\"text-align: center\">" + contact + "</div>"
+	return contact
 }

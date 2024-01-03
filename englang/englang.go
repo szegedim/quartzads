@@ -1,10 +1,13 @@
 package englang
 
 import (
+	"bytes"
 	"fmt"
 	"gitlab.com/eper.io/quartzads/metadata"
 	"io"
 	"net/http"
+	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -44,17 +47,30 @@ func SplitEnglang(str string, pattern string) (items []string) {
 }
 
 func RunEnglang(instructions string) {
-	s := metadata.GetDefaultImplementation()
+	implementationFile := metadata.GetDefaultImplementation()
 	response, err := http.Get(instructions)
 	if err == nil && response != nil && response.Body != nil {
+		//goland:noinspection ALL
 		defer response.Body.Close()
 		buf, _ := io.ReadAll(response.Body)
-		s = string(buf)
+		implementationFile = string(buf)
 	}
-	fmt.Println(s)
-	lines := strings.Split(s, "\n")
+	fmt.Println(implementationFile)
+	lines := strings.Split(implementationFile, "\n")
 	for _, line := range lines {
-		tokens := SplitEnglang(strings.TrimSpace(line), "Set the payment url to %s address.")
+		tokens := SplitEnglang(strings.TrimSpace(line), "Replace all references of %s in the resource project to %s in the current implementation.")
+		if len(tokens) == 2 {
+			list, _ := os.ReadDir("./res")
+			for _, item := range list {
+				if !item.IsDir() && strings.HasSuffix(item.Name(), ".html") {
+					name := path.Join("./res", item.Name())
+					in, _ := os.ReadFile(name)
+					out := bytes.Replace(in, []byte(tokens[0]), []byte(tokens[1]), 1)
+					_ = os.WriteFile(name, out, 0600)
+				}
+			}
+		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Set the payment url to %s address.")
 		if len(tokens) > 0 {
 			metadata.PaymentUrl = tokens[0]
 		}
