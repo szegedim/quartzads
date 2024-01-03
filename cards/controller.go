@@ -272,7 +272,7 @@ func proxyCore(res http.ResponseWriter, req *http.Request) {
 	contentWithCards := string(content)
 
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
-	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+	adBlocker := fmt.Sprintf(metadata.AdBlocker, metadata.ProxySite, metadata.ProxySite)
 
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
