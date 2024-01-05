@@ -41,7 +41,7 @@ func Setup() {
 		return
 	})
 	http.HandleFunc("/rp", func(writer http.ResponseWriter, request *http.Request) {
-		if handleReport(writer, request) {
+		if ReportOnCard(writer, request) {
 			return
 		}
 		return
@@ -172,7 +172,7 @@ func Setup() {
 			SetTarget(englang.SGUID(apiKey), ".")
 		}
 	})
-	http.HandleFunc("/", proxyCore)
+	http.HandleFunc("/", CoreProxy)
 }
 
 func Customize(ret string) string {
