@@ -28,6 +28,7 @@ var SiteTitle = ""
 var Terms = ""
 var Contact = ""
 var AdBlocker = "<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n"
+var AdDescription = "🐞 Advertisement Technology"
 
 var DefaultAdTime = 24 * time.Hour
 var DefaultPurchaseTime = 10 * time.Minute

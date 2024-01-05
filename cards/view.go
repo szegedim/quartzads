@@ -112,7 +112,7 @@ func CoreProxy(res http.ResponseWriter, req *http.Request) {
 }
 
 func GetContactInfo() string {
-	contact := fmt.Sprintf("🐞 Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
+	contact := fmt.Sprintf(metadata.AdDescription+" <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
 	if metadata.Contact != "" {
 		contact = contact + fmt.Sprintf(" Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
 	}

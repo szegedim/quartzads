@@ -70,6 +70,7 @@ func RunEnglang(instructions string) {
 				}
 			}
 			metadata.AdBlocker = strings.ReplaceAll(metadata.AdBlocker, tokens[0], tokens[1])
+			metadata.AdDescription = strings.ReplaceAll(metadata.AdDescription, tokens[0], tokens[1])
 		}
 		tokens = SplitEnglang(strings.TrimSpace(line), "Set the payment url to %s address.")
 		if len(tokens) > 0 {
