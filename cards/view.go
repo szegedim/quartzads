@@ -57,16 +57,8 @@ func CoreProxy(res http.ResponseWriter, req *http.Request) {
 	contentWithCards := string(content)
 
 	placeholders := strings.Count(contentWithCards, metadata.Placeholder)
-	adBlocker := fmt.Sprintf("<div style=\"text-align: center\"><p>Block ads for your convenience. <a href=\"%s\">🐞(hop)</a><!--%s--> </p></div>\n", metadata.ProxySite, metadata.ProxySite)
+	adBlocker := fmt.Sprintf(metadata.AdBlocker, metadata.ProxySite, metadata.ProxySite)
 
-	contact := fmt.Sprintf("🐞 Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
-	if metadata.Contact != "" {
-		contact = contact + fmt.Sprintf(" Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
-	}
-	if metadata.Terms != "" {
-		contact = contact + fmt.Sprintf(" Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
-	}
-	fmt.Println(contact)
 	if placeholders == 0 {
 		contentWithCards = strings.ReplaceAll(contentWithCards, "<body", "<body><br><br><br><br>"+adBlocker+metadata.Placeholder+"<div")
 		contentWithCards = strings.ReplaceAll(contentWithCards, "</body>", "</div>"+metadata.Placeholder+"</body>")
@@ -85,9 +77,9 @@ func CoreProxy(res http.ResponseWriter, req *http.Request) {
 			report = ""
 		}
 		card := fmt.Sprintf(`
-		<div class="showmycard" aria-label="Description of the image">
+		<div class="quartzads" aria-label="Description of the image">
 			%s
-			<img class="showmycardimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
+			<img class="quartzadsimg" id='%s' src="%s" alt="Descriptive text" style="width: 3in;height: auto;" onclick="clicked(event.target, '%s')">
 			%s
 		</div>
 		`, expiryLog, cardId, "/png?apikey="+cardId, target, report)
@@ -113,9 +105,22 @@ func CoreProxy(res http.ResponseWriter, req *http.Request) {
 	contentWithCards = strings.ReplaceAll(contentWithCards, metadata.ProxySite+req.URL.Path, req.URL.Path)
 	contentWithCards = strings.ReplaceAll(contentWithCards, "utm_content=sitename", "utm_content="+metadata.SiteName)
 
-	contentWithCards = strings.Replace(contentWithCards, "</body>", "<div style=\"text-align: center\">"+contact+"</div></body>", 1)
+	contact := GetContactInfo()
+	contentWithCards = strings.Replace(contentWithCards, "</body>", contact+"</body>", 1)
 
 	_, _ = io.WriteString(res, contentWithCards)
+}
+
+func GetContactInfo() string {
+	contact := fmt.Sprintf("🐞 Advertisement Technology <a href=\"%s\">(hop)</a> ", "https://www.showmycard.com")
+	if metadata.Contact != "" {
+		contact = contact + fmt.Sprintf(" Contact & Refunds <a href=\"%s\">(hop)</a> ", metadata.Contact)
+	}
+	if metadata.Terms != "" {
+		contact = contact + fmt.Sprintf(" Privacy & Terms <a href=\"%s\">(hop)</a>", metadata.Terms)
+	}
+	contact = "<div style=\"text-align: center\">" + contact + "</div>"
+	return contact
 }
 
 func ReportOnCard(writer http.ResponseWriter, request *http.Request) bool {
