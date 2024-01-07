@@ -25,6 +25,7 @@ func Backup(in map[string][]byte) {
 	f, _ := os.Create(hash)
 	defer f.Close()
 	_, _ = io.Copy(f, &b)
+	_ = os.Remove(metadata.LatestSnapshotFile)
 	metadata.LatestSnapshotFile = hash
 	fmt.Printf("Backed up %d records to %s file.\n", len(keys), metadata.LatestSnapshotFile)
 }

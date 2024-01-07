@@ -1,4 +1,4 @@
-package cards
+package storage
 
 //Licensed under Creative Commons CC0.
 //
@@ -7,3 +7,5 @@ package cards
 //This software is distributed without any warranty.
 //You should have received a copy of the CC0 Public Domain Dedication along with this software.
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
+
+var Redis = map[string][]byte{}

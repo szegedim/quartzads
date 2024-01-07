@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"gitlab.com/eper.io/quartzads/englang"
 	"gitlab.com/eper.io/quartzads/metadata"
+	"gitlab.com/eper.io/quartzads/storage"
 	"io"
 	"net/http"
 	"os"
@@ -57,7 +58,7 @@ func Setup() {
 			items := englang.SplitEnglang(ret, "%s<!-- Repeat this for all cards -->%s<!-- ... -->%s")
 			if len(items) == 3 {
 				_, _ = io.WriteString(writer, items[0])
-				for k, _ := range redis {
+				for k, _ := range storage.Redis {
 					png := GetPicture(englang.SGUID(k))
 					if len(png) > 0 {
 						_, _ = io.WriteString(writer, strings.ReplaceAll(items[1], "img.png", "/png?apikey="+k))

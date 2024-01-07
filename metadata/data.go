@@ -39,7 +39,10 @@ var LatestSnapshotFile string
 func GetDefaultImplementation() string {
 	_, err := os.Stat("./bin/implementation.eng")
 	if err == nil {
-		os.ReadFile("./bin/implementation.eng")
+		b, _ := os.ReadFile("./bin/implementation.eng")
+		if b != nil && len(b) > 0 {
+			return string(b)
+		}
 	}
 	buf := bytes.Buffer{}
 	if TestPaymentUrl != "" {

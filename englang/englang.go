@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"gitlab.com/eper.io/quartzads/metadata"
+	"gitlab.com/eper.io/quartzads/storage"
 	"io"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 )
 
@@ -104,28 +104,35 @@ func EnglangImplementation(implementationFile string, err error) {
 				metadata.DefaultAdTime = time.Duration(hours) * time.Hour
 			}
 		}
-		tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %d seconds to %s site.")
+		tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %s seconds to %s site.")
 		if len(tokens) > 0 {
-			seconds, _ := strconv.ParseInt(tokens[0], 10, 32)
-			if seconds > 0 && seconds < 10000 {
-				if strings.HasPrefix(tokens[1], "https://") || strings.HasPrefix(tokens[1], "file://") {
-					go func(timer time.Duration, site string) {
-						for {
-							time.Sleep(timer)
-							_, err = os.Stat(metadata.LatestSnapshotFile)
-							if err != nil {
-								continue
-							}
-							if strings.HasPrefix(site, "file://") {
-								copyFile(site)
-							}
-							if strings.HasPrefix(site, "https://") {
-								uploadFile(site)
-							}
-						}
-					}(time.Duration(seconds)*time.Second, tokens[1])
+			AutoBackup(tokens, line)
+		}
+	}
+}
+
+func AutoBackup(tokens []string, line string) {
+	seconds, _ := strconv.ParseInt(tokens[0], 10, 32)
+	if seconds > 0 && seconds < 10000 {
+		if strings.HasPrefix(tokens[1], "https://") || strings.HasPrefix(tokens[1], "file://") {
+			fmt.Println(strings.TrimSpace(line))
+			go func(timer time.Duration, site string) {
+				for {
+					time.Sleep(timer)
+					Backup(storage.Redis)
+					_, err := os.Stat(metadata.LatestSnapshotFile)
+					if err != nil {
+						continue
+					}
+					if strings.HasPrefix(site, "file://") {
+						copyFile(site)
+					}
+					if strings.HasPrefix(site, "https://") {
+						uploadFile(site)
+					}
+					fmt.Printf("Backup finished to %s location.\n", site)
 				}
-			}
+			}(time.Duration(seconds)*time.Second, tokens[1])
 		}
 	}
 }
@@ -133,11 +140,11 @@ func EnglangImplementation(implementationFile string, err error) {
 func copyFile(site string) {
 	// TODO do some sec checks
 	site = site[len("file://"):]
-	out, _ := os.OpenFile(site, syscall.O_CREAT|os.O_TRUNC, 0600)
+	out, _ := os.Create(site)
 	in, _ := os.Open(metadata.LatestSnapshotFile)
 	_, _ = io.Copy(out, in)
-	out.Close()
-	in.Close()
+	defer out.Close()
+	defer in.Close()
 }
 
 func uploadFile(site string) {
@@ -145,7 +152,13 @@ func uploadFile(site string) {
 		return
 	}
 	// TODO do some sec checks
-	out, _ := os.OpenFile(site, syscall.O_CREAT|os.O_TRUNC, 0600)
-	defer out.Close()
-	http.Post(site, "application/octet-stream", out)
+	in, _ := os.Open(metadata.LatestSnapshotFile)
+	defer in.Close()
+	resp, _ := http.Post(site, "application/octet-stream", in)
+	if resp != nil {
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			fmt.Printf("Upload error %d code.\n", resp.StatusCode)
+		}
+	}
 }

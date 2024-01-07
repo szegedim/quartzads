@@ -2,6 +2,7 @@ package cards
 
 import (
 	"bytes"
+	"gitlab.com/eper.io/quartzads/storage"
 	"strings"
 	"sync"
 )
@@ -43,7 +44,7 @@ func Set(key string, value []byte) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	redis[key] = value
+	storage.Redis[key] = value
 	go func() {
 		persistedSet(key, value)
 	}()
@@ -54,7 +55,7 @@ func Add(key string, value []byte) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	current, ok := redis[key]
+	current, ok := storage.Redis[key]
 	if !ok {
 		current = persistedGet(key)
 		if current == nil {
@@ -63,7 +64,7 @@ func Add(key string, value []byte) {
 	}
 	appendtTo := bytes.NewBuffer(current)
 	appendtTo.Write(value)
-	redis[key] = appendtTo.Bytes()
+	storage.Redis[key] = appendtTo.Bytes()
 	go func() {
 		persistedSet(key, appendtTo.Bytes())
 	}()
@@ -74,7 +75,7 @@ func Get(key string) (value []byte) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	value, ok := redis[key]
+	value, ok := storage.Redis[key]
 	if !ok {
 		value = persistedGet(key)
 		if value == nil {
@@ -94,7 +95,7 @@ func List() (keys string) {
 	defer lock.Unlock()
 
 	b := bytes.Buffer{}
-	for k, _ := range redis {
+	for k, _ := range storage.Redis {
 		if !strings.Contains(k, "private") {
 			b.WriteString(k + "\n")
 		}
