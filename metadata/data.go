@@ -3,6 +3,7 @@ package metadata
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -33,7 +34,13 @@ var AdDescription = "🐞 Advertisement Technology"
 var DefaultAdTime = 24 * time.Hour
 var DefaultPurchaseTime = 10 * time.Minute
 
+var LatestSnapshotFile string
+
 func GetDefaultImplementation() string {
+	_, err := os.Stat("./bin/implementation.eng")
+	if err == nil {
+		os.ReadFile("./bin/implementation.eng")
+	}
 	buf := bytes.Buffer{}
 	if TestPaymentUrl != "" {
 		buf.WriteString(fmt.Sprintf("Set the payment url to %s address.", TestPaymentUrl))

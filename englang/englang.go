@@ -10,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -46,7 +47,7 @@ func SplitEnglang(str string, pattern string) (items []string) {
 	return
 }
 
-func RunEnglang(instructions string) {
+func EnglangRemoteImplementation(instructions string) {
 	implementationFile := metadata.GetDefaultImplementation()
 	response, err := http.Get(instructions)
 	if err == nil && response != nil && response.Body != nil {
@@ -55,6 +56,10 @@ func RunEnglang(instructions string) {
 		buf, _ := io.ReadAll(response.Body)
 		implementationFile = string(buf)
 	}
+	EnglangImplementation(implementationFile, err)
+}
+
+func EnglangImplementation(implementationFile string, err error) {
 	fmt.Println(implementationFile)
 	lines := strings.Split(implementationFile, "\n")
 	for _, line := range lines {
@@ -99,5 +104,48 @@ func RunEnglang(instructions string) {
 				metadata.DefaultAdTime = time.Duration(hours) * time.Hour
 			}
 		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %d seconds to %s site.")
+		if len(tokens) > 0 {
+			seconds, _ := strconv.ParseInt(tokens[0], 10, 32)
+			if seconds > 0 && seconds < 10000 {
+				if strings.HasPrefix(tokens[1], "https://") || strings.HasPrefix(tokens[1], "file://") {
+					go func(timer time.Duration, site string) {
+						for {
+							time.Sleep(timer)
+							_, err = os.Stat(metadata.LatestSnapshotFile)
+							if err != nil {
+								continue
+							}
+							if strings.HasPrefix(site, "file://") {
+								copyFile(site)
+							}
+							if strings.HasPrefix(site, "https://") {
+								uploadFile(site)
+							}
+						}
+					}(time.Duration(seconds)*time.Second, tokens[1])
+				}
+			}
+		}
 	}
+}
+
+func copyFile(site string) {
+	// TODO do some sec checks
+	site = site[len("file://"):]
+	out, _ := os.OpenFile(site, syscall.O_CREAT|os.O_TRUNC, 0600)
+	in, _ := os.Open(metadata.LatestSnapshotFile)
+	_, _ = io.Copy(out, in)
+	out.Close()
+	in.Close()
+}
+
+func uploadFile(site string) {
+	if !strings.HasPrefix(site, "https://") {
+		return
+	}
+	// TODO do some sec checks
+	out, _ := os.OpenFile(site, syscall.O_CREAT|os.O_TRUNC, 0600)
+	defer out.Close()
+	http.Post(site, "application/octet-stream", out)
 }

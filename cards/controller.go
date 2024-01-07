@@ -23,7 +23,7 @@ import (
 
 func Setup() {
 	implementation := os.Getenv("IMPLEMENTATION")
-	englang.RunEnglang(implementation)
+	englang.EnglangRemoteImplementation(implementation)
 
 	http.HandleFunc("/1223c99f-70fe-40be-abe3-bf1c6ba1bdb6.txt", func(writer http.ResponseWriter, request *http.Request) {
 		ret := metadata.GetDefaultImplementation()
