@@ -30,12 +30,12 @@ func Backup(in map[string][]byte) {
 	fmt.Printf("Backed up %d records to %s file.\n", len(keys), metadata.LatestSnapshotFile)
 }
 
-func Restore(out *map[string][]byte) {
-	if metadata.LatestSnapshotFile == "" {
-		fmt.Println("no snapshot to restore")
+func Restore(out *map[string][]byte, restoreFile string) {
+	f, err := os.Open(restoreFile)
+	if err != nil {
+		fmt.Printf("no snapshot to restore %s\n", restoreFile)
 		return
 	}
-	f, _ := os.Open(metadata.LatestSnapshotFile)
 	scanner := bufio.NewScanner(f)
 	segment := ""
 	length := 0
@@ -52,5 +52,5 @@ func Restore(out *map[string][]byte) {
 			length = 0
 		}
 	}
-	fmt.Printf("Restored %d records from %s file.\n", n, metadata.LatestSnapshotFile)
+	fmt.Printf("Restored %d records from %s file.\n", n, restoreFile)
 }

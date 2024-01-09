@@ -105,9 +105,28 @@ func EnglangImplementation(implementationFile string, err error) {
 			}
 		}
 		tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %s seconds to %s site.")
-		if len(tokens) > 0 {
+		if len(tokens) == 2 {
 			AutoBackup(tokens, line)
 		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Download %s to %s file.")
+		if len(tokens) == 2 {
+			DownloadFile(tokens[0], tokens[1])
+		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Restore from %s file.")
+		if len(tokens) > 0 {
+			Restore(&storage.Redis, tokens[0])
+		}
+	}
+}
+
+func DownloadFile(url string, path string) {
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		out, _ := os.Create(path)
+		defer out.Close()
+		_, _ = io.Copy(out, res.Body)
 	}
 }
 
