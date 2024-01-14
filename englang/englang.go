@@ -40,6 +40,9 @@ func SplitEnglang(str string, pattern string) (items []string) {
 			break
 		}
 		end := strings.Index(str[index+next:], patterns[1])
+		if end == -1 {
+			break
+		}
 		items = append(items, str[index+next+len(patterns[0]):index+next+end])
 		index = index + next + end
 		patterns = patterns[1:]
