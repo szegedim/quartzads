@@ -104,14 +104,14 @@ func EnglangImplementation(implementationFile string, err error) {
 				metadata.DefaultAdTime = time.Duration(hours) * time.Hour
 			}
 		}
-		//tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %s seconds to %s site.")
-		//if len(tokens) == 2 {
-		//	AutoBackup(tokens, line)
-		//}
-		//tokens = SplitEnglang(strings.TrimSpace(line), "Download %s to %s file.")
-		//if len(tokens) == 2 {
-		//	DownloadFile(tokens[0], tokens[1])
-		//}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Upload snapshot every %s seconds to %s site.")
+		if len(tokens) == 2 {
+			AutoBackup(tokens, line)
+		}
+		tokens = SplitEnglang(strings.TrimSpace(line), "Download %s to %s file.")
+		if len(tokens) == 2 {
+			DownloadFile(tokens[0], tokens[1])
+		}
 		//tokens = SplitEnglang(strings.TrimSpace(line), "Restore from %s file.")
 		//if len(tokens) > 0 {
 		//	Restore(&storage.Redis, tokens[0])
