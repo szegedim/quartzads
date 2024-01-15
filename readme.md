@@ -1,6 +1,6 @@
 # QuartzAds
 
-## Advertising Technology behind www.showmycard.com℠
+## Advertising Technology behind Show My Card℠
 
 # Summary
 
