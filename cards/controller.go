@@ -22,9 +22,14 @@ import (
 //You should have received a copy of the CC0 Public Domain Dedication along with this software.
 //If not, see <https:#creativecommons.org/publicdomain/zero/1.0/legalcode>.
 
+func Undo() {
+	implementation := os.Getenv("IMPLEMENTATION")
+	englang.EnglangRemoteImplementation(implementation, false)
+}
+
 func Setup() {
 	implementation := os.Getenv("IMPLEMENTATION")
-	englang.EnglangRemoteImplementation(implementation)
+	englang.EnglangRemoteImplementation(implementation, true)
 
 	http.HandleFunc("/1223c99f-70fe-40be-abe3-bf1c6ba1bdb6.txt", func(writer http.ResponseWriter, request *http.Request) {
 		ret := metadata.GetDefaultImplementation()

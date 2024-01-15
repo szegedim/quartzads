@@ -50,7 +50,7 @@ func SplitEnglang(str string, pattern string) (items []string) {
 	return
 }
 
-func EnglangRemoteImplementation(instructions string) {
+func EnglangRemoteImplementation(instructions string, do bool) {
 	implementationFile := metadata.GetDefaultImplementation()
 	response, err := http.Get(instructions)
 	if err == nil && response != nil && response.Body != nil {
@@ -59,10 +59,10 @@ func EnglangRemoteImplementation(instructions string) {
 		buf, _ := io.ReadAll(response.Body)
 		implementationFile = string(buf)
 	}
-	EnglangImplementation(implementationFile, err)
+	EnglangImplementation(implementationFile, do)
 }
 
-func EnglangImplementation(implementationFile string, err error) {
+func EnglangImplementation(implementationFile string, do bool) {
 	fmt.Println(implementationFile)
 	lines := strings.Split(implementationFile, "\n")
 	for _, line := range lines {
@@ -73,12 +73,20 @@ func EnglangImplementation(implementationFile string, err error) {
 				if !item.IsDir() && strings.HasSuffix(item.Name(), ".html") {
 					name := path.Join("./res", item.Name())
 					in, _ := os.ReadFile(name)
-					out := bytes.Replace(in, []byte(tokens[0]), []byte(tokens[1]), 1)
-					_ = os.WriteFile(name, out, 0600)
+					if do {
+						out := bytes.Replace(in, []byte(tokens[0]), []byte(tokens[1]), 1)
+						_ = os.WriteFile(name, out, 0600)
+					} else {
+						out := bytes.Replace(in, []byte(tokens[1]), []byte(tokens[0]), 1)
+						_ = os.WriteFile(name, out, 0600)
+					}
 				}
 			}
 			metadata.AdBlocker = strings.ReplaceAll(metadata.AdBlocker, tokens[0], tokens[1])
 			metadata.AdDescription = strings.ReplaceAll(metadata.AdDescription, tokens[0], tokens[1])
+		}
+		if !do {
+			continue
 		}
 		tokens = SplitEnglang(strings.TrimSpace(line), "Set the payment url to %s address.")
 		if len(tokens) > 0 {
