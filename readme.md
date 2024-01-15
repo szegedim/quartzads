@@ -14,7 +14,7 @@ The content can be configured at startup making it very flexible. You can add it
 
 We do not use cookies. The reason is that they require legal opt-ins that slow down prospective customers. Cookies lower the click through rate. We discourage people to use them.
 
-This is a demo for fundraising by the way. See www.showmycard.com℠
+This is a demo for fundraising by the way. See [www.showmycard.com℠](https://demo.showmycard.com)
 
 The business logic is simple. You can collect some of the advertisers who did not get their required return at other ad sites due to a competitor with bigger marketing budget.
 
