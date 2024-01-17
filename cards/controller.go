@@ -76,8 +76,8 @@ func Setup() {
 	http.HandleFunc("/up", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method == "GET" {
 			form, _ := os.ReadFile("./res/testsetup.html")
-			s0 := Customize(string(form))
-			_, _ = io.WriteString(writer, s0)
+			customized := Customize(string(form))
+			_, _ = io.WriteString(writer, customized)
 			return
 		}
 
