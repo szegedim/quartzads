@@ -121,6 +121,12 @@ func GetActivities(id englang.SGUID) (current string) {
 	return
 }
 
+func SetActivities(id englang.SGUID, fullLog string) {
+	logId := string(id) + ".activity"
+	// TODO lock
+	Set(logId, []byte(fullLog))
+}
+
 func FindActivity(id englang.SGUID, pattern string) (activity []string) {
 	activities := GetActivities(id)
 	patterns := strings.Split(pattern, "%s")
@@ -138,9 +144,16 @@ func FindActivity(id englang.SGUID, pattern string) (activity []string) {
 	return
 }
 
+func InvalidateStatistics(id englang.SGUID) {
+	current := GetActivities(id)
+	current = strings.ReplaceAll(current, "Element clicked", "Purchased Element clicked")
+	current = strings.ReplaceAll(current, "Element became visible", "Purchased Element clicked")
+	SetActivities(id, current)
+}
+
 func GetStatistics(id englang.SGUID) (clicks, impressions int) {
 	current := GetActivities(id)
-	clicks = strings.Count(current, "Element clicked")
-	impressions = strings.Count(current, "Element became visible")
+	clicks = strings.Count(current, string(id)+": Element clicked")
+	impressions = strings.Count(current, string(id)+": Element became visible")
 	return
 }

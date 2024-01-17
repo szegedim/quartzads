@@ -118,6 +118,7 @@ func Setup() {
 		apiKey := request.URL.Query().Get("utm_source")
 		redirectSite := request.URL.Query().Get("utm_content")
 		if apiKey != "" {
+			// TODO Make sure history is reset here.
 			http.Redirect(writer, request, redirectSite+"/paid?apikey="+apiKey, http.StatusTemporaryRedirect)
 		}
 		apiKey = request.URL.Query().Get("apikey")
@@ -167,6 +168,8 @@ func Setup() {
 		png := bytes.Buffer{}
 		_, _ = io.Copy(&png, file)
 
+		AddActivity(englang.SGUID(apiKey), apiKey+": Card being purchased.")
+		InvalidateStatistics(englang.SGUID(apiKey))
 		SetPicture(englang.SGUID(apiKey), png.Bytes())
 
 		message := request.FormValue("message")
@@ -198,45 +201,4 @@ func Customize(ret string) string {
 		ret = strings.ReplaceAll(ret, "The card is displayed for 24 hours.", "The card is displayed for some time.")
 	}
 	return ret
-}
-
-func handleReport(writer http.ResponseWriter, request *http.Request) bool {
-	privateKey := request.URL.Query().Get("apikey")
-	apiKey := string(Get(privateKey))
-	if request.Method == "GET" {
-		form, _ := os.Open("./res/testreport.html")
-		defer form.Close()
-		buf := bytes.Buffer{}
-		_, _ = io.Copy(&buf, form)
-		target := GetTarget(englang.SGUID(apiKey))
-		s0 := Customize(buf.String())
-		s0 = strings.ReplaceAll(s0, "https://showmycard.com/7d5f7d3c5a885cead3102434c9becd8a", target)
-		s0 = strings.ReplaceAll(s0, "f7e77596ddf4b12e38e469421d78f3cc.png", "/png?apikey="+apiKey)
-		begin := strings.Index(s0, "<!-- Data begins here -->")
-		end := strings.Index(s0, "<!-- Data ends here -->")
-		if begin != -1 && end != -1 {
-			clicks, impressions := GetStatistics(englang.SGUID(apiKey))
-			clickbar := clicks
-			if clickbar > 60 {
-				clickbar = 60
-			}
-			impressionbar := impressions
-			if impressionbar > 60 {
-				impressionbar = 60
-			}
-			pattern := `
-				<rect class="impression" x="20" y="%d" width="10" height="%d" rx="2.5"></rect>
-				<rect class="click" x="60" y="%d" width="10" height="%d" rx="2.5"></rect>
-				<text class="impression" x="20" y="%d">%d</text>
-				<text class="click" x="60" y="%d">%d</text>
-				`
-			s0 = strings.ReplaceAll(s0, s0[begin:end+len("<!-- Data ends here -->")], fmt.Sprintf(pattern, 85-impressionbar, impressionbar, 85-clickbar, clickbar, 96, impressions, 96, clicks))
-		}
-		s0 = strings.ReplaceAll(s0, "<!-- Location goes here -->", "<a href=\""+GetLocation(englang.SGUID(apiKey))+"\">Paid media</a>")
-		buffered := bufio.NewWriter(writer)
-		_, _ = buffered.WriteString(s0)
-		_ = buffered.Flush()
-		return true
-	}
-	return false
 }
